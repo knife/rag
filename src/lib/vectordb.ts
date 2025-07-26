@@ -1,20 +1,26 @@
-import { ChromaApi, OpenAIApi } from 'chromadb'
-import { OpenAIEmbeddings } from '@langchain/openai'
+import { ChromaClient } from 'chromadb'
+
+import { OllamaEmbeddings } from '@langchain/ollama'
+
+// Initialize Ollama embeddings
+
+
+
 import { Document } from '@langchain/core/documents'
 import { Chroma } from '@langchain/community/vectorstores/chroma'
 
-const client = new ChromaApi({
-    host: process.env.CHROMA_HOST || 'localhost',
-    port: process.env.CHROMA_PORT || '8000',
+const client = new ChromaClient({
+    path: `http://${process.env.CHROMA_HOST || 'localhost'}:${process.env.CHROMA_PORT || '8000'}`,
 })
 
 export class VectorDB {
-    private embeddings: OpenAIEmbeddings
+    private embeddings: OllamaEmbeddings
 
     constructor(apiKey?: string) {
-        this.embeddings = new OpenAIEmbeddings({
-            openAIApiKey: apiKey || process.env.OPENAI_API_KEY,
-        })
+        this.embeddings = new OllamaEmbeddings({
+            model: 'nomic-embed-text', // or 'all-minilm' for smaller model
+            baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+          })
     }
 
     async createCollection(collectionId: string) {

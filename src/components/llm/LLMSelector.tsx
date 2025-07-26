@@ -56,7 +56,7 @@ export function LLMSelector() {
                             <label className="text-sm font-medium mb-2 block">Provider</label>
                             <Select
                                 value={selectedProvider?.id}
-                                onValueChange={(value) => {
+                                onValueChange={(value: string) => {
                                     const provider = LLM_PROVIDERS.find(p => p.id === value)
                                     if (provider) {
                                         setSelectedProvider(provider)
