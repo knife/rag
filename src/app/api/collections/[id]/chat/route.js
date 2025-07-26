@@ -1,0 +1,137 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/db'
+import { VectorDB } from '@/lib/vectordb'
+import { createLLMInstance, LLM_PROVIDERS } from '@/lib/llm'
+import { PromptTemplate } from '@langchain/core/prompts'
+
+const CHAT_PROMPT = PromptTemplate.fromTemplate(`
+You are a helpful AI assistant that answers questions based on the provided context from documents.
+
+Context from documents:
+{context}
+
+Question: {question}
+
+Please provide a helpful and accurate answer based on the context above. If the context doesn't contain enough information to answer the question, please say so clearly. Always cite which documents you're referencing when possible.
+
+Answer:`)
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Verify collection ownership
+    const collection = await prisma.collection.findFirst({
+      where: {
+        id: params.id,
+        userId: session.user.id,
+      },
+      include: { documents: true }
+    })
+
+    if (!collection) {
+      return NextResponse.json({ error: 'Collection not found' }, { status: 404 })
+    }
+
+    const { message, llmProvider, llmModel } = await request.json()
+
+    if (!message?.trim()) {
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 })
+    }
+
+    // Get user's API keys
+    const apiKeys = await prisma.apiKey.findMany({
+      where: { userId: session.user.id }
+    })
+
+    const apiKeyMap = apiKeys.reduce((acc, key) => {
+      acc[key.provider] = key.key
+      return acc
+    }, {} as Record<string, string>)
+
+    // Find LLM provider
+    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
+    const model = llmModel || provider.models[0]
+
+    // Get API key for provider if required
+    let apiKey: string | undefined
+    if (provider.requiresApiKey) {
+      apiKey = apiKeyMap[provider.id]
+      if (!apiKey) {
+        return NextResponse.json({
+          error: `API key required for ${provider.name}`
+        }, { status: 400 })
+      }
+    }
+
+    // Search for relevant documents
+    const vectorDB = new VectorDB(apiKey)
+    const relevantDocs = await vectorDB.searchDocuments(params.id, message, 5)
+
+    // Prepare context
+    const context = relevantDocs
+      .map(doc => `Document: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
+      .join('\n\n---\n\n')
+
+    // Get document sources
+    const sources = [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
+
+    // Create LLM instance and generate response
+    const llm = await createLLMInstance(provider, model, apiKey)
+    const prompt = await CHAT_PROMPT.format({
+      context,
+      question: message
+    })
+
+    const response = await llm.invoke(prompt)
+    const responseContent = typeof response.content === 'string'
+      ? response.content
+      : response.content.toString()
+
+    // Save chat session and messages (simplified)
+    let chatSession = await prisma.chatSession.findFirst({
+      where: { collectionId: params.id },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    if (!chatSession) {
+      chatSession = await prisma.chatSession.create({
+        data: { collectionId: params.id }
+      })
+    }
+
+    // Save messages
+    await prisma.chatMessage.createMany({
+      data: [
+        {
+          sessionId: chatSession.id,
+          role: 'user',
+          content: message,
+          sources: []
+        },
+        {
+          sessionId: chatSession.id,
+          role: 'assistant',
+          content: responseContent,
+          sources
+        }
+      ]
+    })
+
+    return NextResponse.json({
+      response: responseContent,
+      sources
+    })
+  } catch (error) {
+    console.error('Error in chat:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
