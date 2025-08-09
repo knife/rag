@@ -20,10 +20,13 @@ Answer:`)
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
+
+    const { id } = await params;
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -31,7 +34,7 @@ export async function POST(
     // Verify collection ownership
     const collection = await prisma.collection.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id,
       },
       include: { documents: true }
@@ -74,7 +77,7 @@ export async function POST(
 
     // Search for relevant documents
     const vectorDB = new VectorDB(apiKey)
-    const relevantDocs = await vectorDB.searchDocuments(params.id, message, 5)
+    const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
 
     // Prepare context
     const context = relevantDocs
@@ -98,13 +101,13 @@ export async function POST(
 
     // Save chat session and messages (simplified)
     let chatSession = await prisma.chatSession.findFirst({
-      where: { collectionId: params.id },
+      where: { collectionId: id },
       orderBy: { createdAt: 'desc' }
     })
 
     if (!chatSession) {
       chatSession = await prisma.chatSession.create({
-        data: { collectionId: params.id }
+        data: { collectionId: id }
       })
     }
 

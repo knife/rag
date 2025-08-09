@@ -1,11 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --background-color: 255, 255, 255
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,7 +12,12 @@
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
+    --background-color: 0, 0, 0
   }
+}
+
+.bg-background {
+  background-color: rgb(var(--background-color))
 }
 
 body {

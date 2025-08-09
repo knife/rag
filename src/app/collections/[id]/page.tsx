@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -24,6 +25,7 @@ export default function CollectionDetailPage({ params }: Props) {
     const [isLoading, setIsLoading] = useState(true)
     const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+
 
     useEffect(() => {
         if (status === 'loading') return
@@ -164,9 +166,9 @@ export default function CollectionDetailPage({ params }: Props) {
             </header>
 
             {/* Main Content */}
-            <div className="flex h-[calc(100vh-4rem)]">
+            <div className="flex min-h-[calc(100vh-4rem)]">
                 {/* Left Sidebar - Documents */}
-                <div className="w-1/3 bg-white border-r border-slate-200 flex flex-col">
+                <div className="w-1/3 bg-white min-h-[calc(100vh-4rem)] border-r border-b border-slate-200 flex flex-col">
                     <div className="p-4 border-b border-slate-200">
                         <h2 className="font-semibold text-lg text-slate-900 flex items-center">
                             <FileText className="w-5 h-5 mr-2" />

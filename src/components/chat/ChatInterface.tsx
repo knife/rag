@@ -55,7 +55,7 @@ export function ChatInterface({ messages, onSendMessage, documents, isLoading = 
     }
 
     return (
-        <div className="flex flex-col h-full bg-slate-50">
+        <div className="flex flex-col h-full bg-background">
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 ? (

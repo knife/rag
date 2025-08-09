@@ -9,10 +9,11 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
+    const { id } = await params;
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -20,7 +21,7 @@ export async function POST(
     // Verify collection ownership
     const collection = await prisma.collection.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id,
       }
     })
@@ -68,8 +69,8 @@ export async function POST(
 
     // Split text into chunks
     const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-      chunkOverlap: 200,
+      chunkSize: 500,
+      chunkOverlap: 100,
     })
 
     const chunks = await textSplitter.splitText(content)
@@ -80,7 +81,7 @@ export async function POST(
         name: documentName,
         content,
         type: documentType,
-        collectionId: params.id,
+        collectionId: id,
         vectorIds: [], // Will be updated after vector insertion
       }
     })
@@ -98,7 +99,7 @@ export async function POST(
       })
     )
 
-    await vectorDB.addDocuments(params.id, langchainDocs)
+    await vectorDB.addDocuments(id, langchainDocs)
 
     // Update document with vector IDs (simplified - in real implementation you'd get actual IDs)
     const vectorIds = chunks.map((_, index) => `${document.id}_chunk_${index}`)

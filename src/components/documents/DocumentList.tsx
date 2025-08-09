@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, FilePdf, Eye, Trash2, Calendar } from 'lucide-react'
+import { FileText, File, Eye, Trash2, Calendar } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Document } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -54,7 +54,7 @@ export function DocumentList({
                             document.type === 'pdf' ? 'bg-red-100' : 'bg-blue-100'
                         }`}>
                             {document.type === 'pdf' ? (
-                                <FilePdf className="w-4 h-4 text-red-600" />
+                                <File className="w-4 h-4 text-red-600" />
                             ) : (
                                 <FileText className="w-4 h-4 text-blue-600" />
                             )}

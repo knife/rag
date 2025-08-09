@@ -2,11 +2,19 @@ import type { LLMProvider } from '@/types'
 
 export const LLM_PROVIDERS: LLMProvider[] = [
     {
+        id: 'ollama-smollm2',
+        name: 'SmallLLM 2 (Local)',
+        type: 'local',
+        endpoint: 'http://localhost:11434',
+        models: ['smollm2:360m'],
+        requiresApiKey: false,
+    },
+    {
         id: 'ollama-llama2',
         name: 'Llama 2 (Local)',
         type: 'local',
         endpoint: 'http://localhost:11434',
-        models: ['llama2', 'llama2:13b', 'llama2:70b'],
+        models: ['llama2:7b', 'llama2:13b', 'llama2:70b'],
         requiresApiKey: false,
     },
     {

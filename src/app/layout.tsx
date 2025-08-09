@@ -1,6 +1,12 @@
+
+import 'tailwindcss';
 import './globals.css'
+import '@radix-ui/themes/styles.css'
+
+
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Theme, Container } from '@radix-ui/themes'
 import { AuthProvider } from '@/components/auth/AuthProvider'
 import { LLMProvider } from '@/components/llm/LLMProvider'
 import { Toaster } from '@/components/ui/toaster'
@@ -22,9 +28,11 @@ export default function RootLayout({
         <body className={inter.className}>
         <AuthProvider>
             <LLMProvider>
-                <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-                    {children}
-                </div>
+                <Theme>
+                        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+                            {children}
+                        </div>
+                </Theme>
                 <Toaster />
             </LLMProvider>
         </AuthProvider>

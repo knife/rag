@@ -60,6 +60,7 @@ export class VectorDB {
                     url: `http://${process.env.CHROMA_HOST}:${process.env.CHROMA_PORT}`,
                 }
             )
+            console.log(vectorStore);
 
             const results = await vectorStore.similaritySearch(query, k)
             return results
