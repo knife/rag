@@ -27,7 +27,7 @@ export async function POST(
 
     const { id } = await params;
 
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -35,7 +35,9 @@ export async function POST(
     const collection = await prisma.collection.findFirst({
       where: {
         id: id,
-        userId: session.user.id,
+        user: {
+          email: session.user.email
+        }
       },
       include: { documents: true }
     })
@@ -52,7 +54,9 @@ export async function POST(
 
     // Get user's API keys
     const apiKeys = await prisma.apiKey.findMany({
-      where: { userId: session.user.id }
+      where: {
+        user: {
+          email: session.user.email } }
     })
 
     const apiKeyMap = apiKeys.reduce((acc, key) => {

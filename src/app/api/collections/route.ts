@@ -7,12 +7,12 @@ import { VectorDB } from '@/lib/vectordb'
 export async function GET() {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
         const collections = await prisma.collection.findMany({
-            where: { userId: session.user.id },
+            where: { user: {email:  session.user.email } },
             include: {
                 documents: true,
                 _count: { select: { documents: true } }
@@ -30,30 +30,33 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
         const { name, description } = await request.json()
+        const user = await prisma.user.findFirst({where: { email: session.user.email }})
 
         if (!name?.trim()) {
             return NextResponse.json({ error: 'Name is required' }, { status: 400 })
         }
 
-        const collection = await prisma.collection.create({
-            data: {
-                name: name.trim(),
-                description: description?.trim(),
-                userId: session.user.id,
-            },
-            include: { documents: true }
-        })
+        if (user) {
+            const collection = await prisma.collection.create({
+                data: {
+                    name: name.trim(),
+                    description: description?.trim(),
+                    userId: user.id,
+                },
+                include: {documents: true}
+            })
 
         // Create vector database collection
         const vectorDB = new VectorDB()
         await vectorDB.createCollection(collection.id)
 
         return NextResponse.json(collection, { status: 201 })
+        }
     } catch (error) {
         console.error('Error creating collection:', error)
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

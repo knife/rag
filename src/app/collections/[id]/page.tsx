@@ -10,12 +10,11 @@ import { ChatInterface } from '@/components/chat/ChatInterface'
 import { UploadDialog } from '@/components/documents/UploadDialog'
 import { Button } from '@/components/ui/button'
 import { LLMSelector } from '@/components/llm/LLMSelector'
+import { useParams } from 'next/navigation'
 
-interface Props {
-    params: { id: string }
-}
 
-export default function CollectionDetailPage({ params }: Props) {
+
+export default function CollectionDetailPage() {
     const { data: session, status } = useSession()
     const router = useRouter()
     const [collection, setCollection] = useState<Collection | null>(null)
@@ -25,6 +24,8 @@ export default function CollectionDetailPage({ params }: Props) {
     const [isLoading, setIsLoading] = useState(true)
     const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+
+    const params = useParams<{ id: string }>()
 
 
     useEffect(() => {
@@ -43,7 +44,7 @@ export default function CollectionDetailPage({ params }: Props) {
                 const data = await response.json()
                 setCollection(data)
                 setDocuments(data.documents || [])
-                setMessages(data.chatSessions[0]?.messages)
+                setMessages(data.chatSessions[0]?.messages || [])
             }
         } catch (error) {
             console.error('Error fetching collection:', error)

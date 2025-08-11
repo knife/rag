@@ -7,18 +7,21 @@ import { VectorDB } from '@/lib/vectordb'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const { id } = await params;
+        const user = await prisma.user.findFirst({where: { email: session.user.email }})
+
         const collection = await prisma.collection.findFirst({
             where: {
-                id: params.id,
-                userId: session.user.id,
+                id: id,
+                userId: user?.id,
             },
             include: {
                 documents: {
@@ -47,18 +50,22 @@ export async function GET(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const { id } = await params;
+
         const collection = await prisma.collection.findFirst({
             where: {
-                id: params.id,
-                userId: session.user.id,
+                id: id,
+                user: {
+                    email: session.user.email
+                }
             }
         })
 
@@ -68,11 +75,11 @@ export async function DELETE(
 
         // Delete from vector database
         const vectorDB = new VectorDB()
-        await vectorDB.deleteCollection(params.id)
+        await vectorDB.deleteCollection(id)
 
         // Delete from main database
         await prisma.collection.delete({
-            where: { id: params.id }
+            where: { id: id }
         })
 
         return NextResponse.json({ success: true })

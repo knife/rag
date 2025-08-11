@@ -13,10 +13,6 @@ export async function GET() {
         // Get user by email and fetch preferences
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
-            select: {
-                id: true,
-                llmPreferences: true
-            }
         })
 
         if (!user) {
@@ -25,23 +21,11 @@ export async function GET() {
 
         // Parse LLM preferences from JSON
         const defaultPrefs = { provider: 'ollama', model: 'llama2', apiKeys: {} }
-        let preferences = defaultPrefs
-        
-        if (user.llmPreferences) {
-            try {
-                preferences = typeof user.llmPreferences === 'string' 
-                    ? JSON.parse(user.llmPreferences)
-                    : user.llmPreferences as any
-            } catch (error) {
-                console.error('Error parsing LLM preferences:', error)
-                preferences = defaultPrefs
-            }
-        }
+
 
         return NextResponse.json({
-            provider: preferences.provider || 'ollama',
-            model: preferences.model || 'llama2',
-            apiKeys: preferences.apiKeys || {}
+            provider: user.llmProvider || defaultPrefs.provider,
+            model: user.llmModel || defaultPrefs.model,
         })
     } catch (error) {
         console.error('Error fetching LLM preferences:', error)
@@ -66,13 +50,6 @@ export async function POST(request: NextRequest) {
 
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
-        }
-
-        // Update user's LLM preferences in JSON field
-        const preferences = {
-            provider: provider || 'ollama',
-            model: model || 'llama2',
-            apiKeys: apiKeys || {}
         }
 
         await prisma.user.update({

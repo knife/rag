@@ -8,7 +8,7 @@ export async function GET() {
     try {
         const session = await getServerSession(authOptions)
 
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return NextResponse.json(
                 { error: 'Not authenticated' },
                 { status: 401 }
@@ -16,7 +16,7 @@ export async function GET() {
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
+            where: { email: session.user.email },
             select: {
                 id: true,
                 email: true,
@@ -52,7 +52,7 @@ export async function PATCH(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
 
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return NextResponse.json(
                 { error: 'Not authenticated' },
                 { status: 401 }
@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest) {
         const { name } = await request.json()
 
         const updatedUser = await prisma.user.update({
-            where: { id: session.user.id },
+            where: { email: session.user.email },
             data: {
                 name: name?.trim() || null,
             },
