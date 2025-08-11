@@ -43,6 +43,7 @@ export default function CollectionDetailPage({ params }: Props) {
                 const data = await response.json()
                 setCollection(data)
                 setDocuments(data.documents || [])
+                setMessages(data.chatSessions[0]?.messages)
             }
         } catch (error) {
             console.error('Error fetching collection:', error)

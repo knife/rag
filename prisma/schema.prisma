@@ -12,6 +12,8 @@ model User {
   email     String   @unique
   name      String?
   password  String
+  llmProvider String? @default("ollama")
+  llmModel    String? @default("llama2")
   apiKeys   ApiKey[]
   collections Collection[]
   createdAt DateTime @default(now())

@@ -23,6 +23,13 @@ export async function GET(
             include: {
                 documents: {
                     orderBy: { createdAt: 'desc' }
+                },
+                chatSessions: {
+                    include: {
+                        messages: {
+                            orderBy: { createdAt: 'asc' }
+                        }
+                    }
                 }
             }
         })
