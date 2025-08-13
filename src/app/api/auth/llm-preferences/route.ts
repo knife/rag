@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { provider, model, apiKeys } = await request.json()
+        const { provider, model, apiKey } = await request.json()
 
         // Get user by email
         const user = await prisma.user.findUnique({
@@ -59,6 +59,21 @@ export async function POST(request: NextRequest) {
                 llmModel: model || 'llama2',
             }
         })
+
+        if (apiKeys) {
+            const apiKey = await prisma.apiKeys.findUnique({
+                where: {
+                    user: {
+                        id: user.id
+                    },
+                    provider: provider
+                }
+            })
+
+            apiKey.update({
+                key: apiKey
+            })
+        }
 
         return NextResponse.json({ success: true })
     } catch (error) {

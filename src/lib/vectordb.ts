@@ -1,4 +1,4 @@
-import { ChromaClient } from 'chromadb'
+import {ChromaClient, CloudClient} from 'chromadb'
 
 import { OllamaEmbeddings } from '@langchain/ollama'
 
@@ -9,9 +9,22 @@ import { OllamaEmbeddings } from '@langchain/ollama'
 import { Document } from '@langchain/core/documents'
 import { Chroma } from '@langchain/community/vectorstores/chroma'
 
-const client = new ChromaClient({
-    path: `http://${process.env.CHROMA_HOST || 'localhost'}:${process.env.CHROMA_PORT || '8000'}`,
-})
+let client;
+
+if (process.env.CHROMA_HOST == 'localhost') {
+    client = new ChromaClient({
+        path: `http://${process.env.CHROMA_HOST || 'localhost'}:${process.env.CHROMA_PORT || '8000'}`,
+    })
+
+} else {
+    client = new CloudClient({
+        apiKey: process.env.CHROMA_API_KEY,
+        tenant: '88b5f29d-342c-45dc-98d4-da284f24b1d4',
+        database: 'ragdb'
+    });
+
+}
+
 
 export class VectorDB {
     private embeddings: OllamaEmbeddings
