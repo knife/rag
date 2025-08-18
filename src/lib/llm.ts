@@ -50,7 +50,12 @@ export const LLM_PROVIDERS: LLMProvider[] = [
 ]
 
 export async function createLLMInstance(provider: LLMProvider, model: string, apiKey?: string) {
-    
+    const { ChatOpenAI } = await import('@langchain/openai')
+    console.log('Teraz jest openai');
+    return new ChatOpenAI({
+        openAIApiKey: process.env.OPENAI_KEY,
+        modelName: model,
+    })
 
     console.log('Dlaczego kurna', provider)
     if (provider.type === 'local') {
@@ -60,7 +65,6 @@ export async function createLLMInstance(provider: LLMProvider, model: string, ap
             model: model,
         })
     } else if (provider.id === 'openai') {
-        const { ChatOpenAI } = await import('@langchain/openai')
         console.log('Teraz jest openai');
         return new ChatOpenAI({
             openAIApiKey: process.env.OPENAI_KEY,
