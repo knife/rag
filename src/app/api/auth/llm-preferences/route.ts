@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { provider, model, apiKey } = await request.json()
+        const { provider, model, apiKeys } = await request.json()
+        console.log("Z llma", provider, model, apiKeys)
 
         // Get user by email
         const user = await prisma.user.findUnique({
@@ -60,19 +61,39 @@ export async function POST(request: NextRequest) {
             }
         })
 
-        if (false) {
-            const apiKey = await prisma.apiKeys.findUnique({
-                where: {
-                    user: {
-                        id: user.id
-                    },
-                    provider: provider
-                }
-            })
+        if (apiKeys) {
+            for (const property in apiKeys) {
+                console.log(property,apiKeys[property])
 
-            apiKey.update({
-                key: apiKey
-            })
+                const apiKeyRecord = await prisma.apiKey.findFirst({
+                    where: {
+                        userId: user.id,
+                        provider: property
+                    }
+                })
+
+                console.log(apiKeyRecord);
+
+                if (apiKeyRecord) {
+                    await prisma.apiKey.update({
+                        where: {
+                            id: apiKeyRecord.id,
+                            provider: property
+                        },
+                        data: {
+                          key: apiKeys[property]
+                        }
+                    })
+                } else {
+                   await prisma.apiKey.create({
+                       data: {
+                           userId: user.id,
+                           provider: property,
+                           key: apiKeys[property]
+                       }
+                   })
+                }
+            }
         }
 
         return NextResponse.json({ success: true })

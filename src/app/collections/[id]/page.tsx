@@ -64,7 +64,9 @@ export default function CollectionDetailPage() {
             if (text) {
                 formData.append('text', text)
                 formData.append('name', 'Text Document')
+
             }
+            formData.append('llmProvider', selectedProvider.id)
 
             const response = await fetch(`/api/collections/${params.id}/documents`, {
                 method: 'POST',

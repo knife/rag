@@ -1,4 +1,6 @@
 import type { LLMProvider } from '@/types'
+import {ChatOpenAI} from "@langchain/openai";
+import {NextResponse} from "next/server";
 
 export const LLM_PROVIDERS: LLMProvider[] = [
     {
@@ -38,7 +40,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         name: 'OpenAI GPT',
         type: 'remote',
         models: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-4o-mini'],
-        requiresApiKey: false,
+        requiresApiKey: true,
     },
     {
         id: 'anthropic',
@@ -50,14 +52,13 @@ export const LLM_PROVIDERS: LLMProvider[] = [
 ]
 
 export async function createLLMInstance(provider: LLMProvider, model: string, apiKey?: string) {
-    const { ChatOpenAI } = await import('@langchain/openai')
+    console.log('Dlaczego kurna', provider)
     console.log('Teraz jest openai');
     return new ChatOpenAI({
-        openAIApiKey: process.env.OPENAI_KEY,
+        openAIApiKey: apiKey,
         modelName: model,
-    })
+    });
 
-    console.log('Dlaczego kurna', provider)
     if (provider.type === 'local') {
         const { ChatOllama } = await import('@langchain/community/chat_models/ollama')
         return new ChatOllama({
@@ -67,7 +68,7 @@ export async function createLLMInstance(provider: LLMProvider, model: string, ap
     } else if (provider.id === 'openai') {
         console.log('Teraz jest openai');
         return new ChatOpenAI({
-            openAIApiKey: process.env.OPENAI_KEY,
+            openAIApiKey: apiKey,
             modelName: model,
         })
     } else if (provider.id === 'anthropic') {
@@ -79,4 +80,17 @@ export async function createLLMInstance(provider: LLMProvider, model: string, ap
     }
 
     throw new Error(`Unsupported provider: ${provider.id}`)
+}
+
+export function getApiKeyForProvider(apiKeys, activeProvider){
+    const apiKeyMap = apiKeys.reduce((acc, key) => {
+        acc[key.provider] = key.key
+        return acc
+    }, {} as Record<string, string>)
+
+    // Find LLM provider
+    const provider = LLM_PROVIDERS.find(p => p.id === activeProvider) || LLM_PROVIDERS[0]
+    console.log("provider", provider)
+
+    return [provider,apiKeyMap[provider.id]]
 }

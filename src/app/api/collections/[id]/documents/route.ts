@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { VectorDB } from '@/lib/vectordb'
 import pdfParse from 'pdf-parse'
+import { getApiKeyForProvider, LLM_PROVIDERS } from '@/lib/llm'
 import { Document } from '@langchain/core/documents'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
@@ -36,6 +37,7 @@ export async function POST(
     const file = formData.get('file') as File
     const text = formData.get('text') as string
     const name = formData.get('name') as string
+    const llmProvider = formData.get('llmProvider') as string
 
     let content = ''
     let documentName = ''
@@ -88,8 +90,32 @@ export async function POST(
       }
     })
 
+
+    // Get user's API keys
+    const apiKeys = await prisma.apiKey.findMany({
+      where: {
+        user: {
+          email: session.user.email } }
+    })
+
+
+    let apiKey: string | undefined
+
+    const apiKeyMap = apiKeys.reduce((acc, key) => {
+      acc[key.provider] = key.key
+      return acc
+    }, {} as Record<string, string>)
+
+    // Find LLM provider
+    console.log(llmProvider);
+    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
+    console.log("provider", provider)
+
+    apiKey = apiKeyMap[provider.id]
+
+
     // Create vector embeddings
-    const vectorDB = new VectorDB()
+    const vectorDB = new VectorDB(apiKey)
     const langchainDocs = chunks.map(
       (chunk, index) => new Document({
         pageContent: chunk,

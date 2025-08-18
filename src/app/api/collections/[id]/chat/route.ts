@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { VectorDB } from '@/lib/vectordb'
-import { createLLMInstance, LLM_PROVIDERS } from '@/lib/llm'
+import { createLLMInstance, getApiKeyForProvider, LLM_PROVIDERS } from '@/lib/llm'
 import { PromptTemplate } from '@langchain/core/prompts'
 
 const CHAT_PROMPT = PromptTemplate.fromTemplate(`
@@ -60,25 +60,22 @@ export async function POST(
           email: session.user.email } }
     })
 
+    let apiKey: string | undefined
+
     const apiKeyMap = apiKeys.reduce((acc, key) => {
       acc[key.provider] = key.key
       return acc
     }, {} as Record<string, string>)
 
     // Find LLM provider
-    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
+    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider.id) || LLM_PROVIDERS[0]
+    console.log("provider", provider)
+
+    apiKey = apiKeyMap[provider.id]
     const model = llmModel || provider.models[0]
 
     // Get API key for provider if required
-    let apiKey: string | undefined
-    if (provider.requiresApiKey) {
-      apiKey = apiKeyMap[provider.id]
-      if (!apiKey) {
-        return NextResponse.json({
-          error: `API key required for ${provider.name}`
-        }, { status: 400 })
-      }
-    }
+
 
     // Search for relevant documents
     const vectorDB = new VectorDB(apiKey)

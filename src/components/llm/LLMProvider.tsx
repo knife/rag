@@ -88,6 +88,7 @@ export function LLMProvider({ children }: { children: ReactNode }) {
     }, [])
 
     const savePreferences = async (provider?: LLMProviderType | null, model?: string | null, keys?: Record<string, string>) => {
+        console.log("co jest", model, provider)
         try {
             const data = {
                 provider: provider?.id || selectedProvider?.id || 'ollama',
