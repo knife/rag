@@ -47,6 +47,7 @@ export async function POST(
     }
 
     const { message, llmProvider, llmModel } = await request.json()
+    console.log(llmProvider, llmModel)
 
     if (!message?.trim()) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
@@ -88,11 +89,13 @@ export async function POST(
       .map(doc => `Document: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
       .join('\n\n---\n\n')
 
+      console.log(context);
     // Get document sources
     const sources = [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
 
     // Create LLM instance and generate response
     const llm = await createLLMInstance(provider, model, apiKey)
+    console.log("to dziala",llm)
     const prompt = await CHAT_PROMPT.format({
       context,
       question: message

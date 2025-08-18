@@ -57,6 +57,8 @@ export function LLMProvider({ children }: { children: ReactNode }) {
                 // Then load from API to sync with database
                 try {
                     const response = await fetch('/api/auth/llm-preferences')
+                    console.log('TERA MUSI')
+                    console.log(response)
                     if (response.ok) {
                         const data = await response.json()
                         

@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
             }
         })
 
-        if (apiKeys) {
+        if (false) {
             const apiKey = await prisma.apiKeys.findUnique({
                 where: {
                     user: {

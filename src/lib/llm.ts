@@ -37,8 +37,8 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         id: 'openai',
         name: 'OpenAI GPT',
         type: 'remote',
-        models: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo'],
-        requiresApiKey: true,
+        models: ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo', 'gpt-4o-mini'],
+        requiresApiKey: false,
     },
     {
         id: 'anthropic',
@@ -50,6 +50,9 @@ export const LLM_PROVIDERS: LLMProvider[] = [
 ]
 
 export async function createLLMInstance(provider: LLMProvider, model: string, apiKey?: string) {
+    
+
+    console.log('Dlaczego kurna', provider)
     if (provider.type === 'local') {
         const { ChatOllama } = await import('@langchain/community/chat_models/ollama')
         return new ChatOllama({
@@ -58,8 +61,9 @@ export async function createLLMInstance(provider: LLMProvider, model: string, ap
         })
     } else if (provider.id === 'openai') {
         const { ChatOpenAI } = await import('@langchain/openai')
+        console.log('Teraz jest openai');
         return new ChatOpenAI({
-            openAIApiKey: apiKey,
+            openAIApiKey: process.env.OPENAI_KEY,
             modelName: model,
         })
     } else if (provider.id === 'anthropic') {

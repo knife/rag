@@ -11,6 +11,7 @@ import { UploadDialog } from '@/components/documents/UploadDialog'
 import { Button } from '@/components/ui/button'
 import { LLMSelector } from '@/components/llm/LLMSelector'
 import { useParams } from 'next/navigation'
+import {useLLM} from "../../../components/llm/LLMProvider";
 
 
 
@@ -24,6 +25,7 @@ export default function CollectionDetailPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+    const { selectedProvider, selectedModel, setSelectedProvider, setSelectedModel, apiKeys, setApiKey } = useLLM()
 
     const params = useParams<{ id: string }>()
 
@@ -92,7 +94,7 @@ export default function CollectionDetailPage() {
             const response = await fetch(`/api/collections/${params.id}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message }),
+                body: JSON.stringify({ message: message, llmModel: selectedModel, llmProvider: selectedProvider }),
             })
 
             if (response.ok) {

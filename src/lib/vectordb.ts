@@ -8,6 +8,7 @@ import { OllamaEmbeddings } from '@langchain/ollama'
 
 import { Document } from '@langchain/core/documents'
 import { Chroma } from '@langchain/community/vectorstores/chroma'
+import {OpenAI, OpenAIEmbeddings} from "@langchain/openai";
 
 let client;
 
@@ -27,14 +28,26 @@ if (process.env.CHROMA_HOST == 'localhost') {
 
 
 export class VectorDB {
-    private embeddings: OllamaEmbeddings
+    private embeddings: OllamaEmbeddings | OpenAIEmbeddings
 
     constructor(apiKey?: string) {
-        this.embeddings = new OllamaEmbeddings({
-            model: 'nomic-embed-text', // or 'all-minilm' for smaller model
-            baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-          })
+
+        if (process.env.CHROMA_HOST == 'olocalhost') {
+            this.embeddings = new OllamaEmbeddings({
+                model: 'nomic-embed-text', // or 'all-minilm' for smaller model
+                baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+            })
+
+        } else {
+                this.embeddings = new OpenAIEmbeddings({
+                    apiKey: process.env.OPENAI_KEY,
+                    batchSize: 512,
+                    model: "text-embedding-3-large"
+                });
+        }
     }
+
+
 
     async createCollection(collectionId: string) {
         try {
