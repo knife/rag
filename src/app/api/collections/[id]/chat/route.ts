@@ -68,7 +68,7 @@ export async function POST(
     }, {} as Record<string, string>)
 
     // Find LLM provider
-    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider.id) || LLM_PROVIDERS[0]
+    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
     console.log("provider", provider)
 
     apiKey = apiKeyMap[provider.id]

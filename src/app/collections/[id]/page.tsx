@@ -101,6 +101,7 @@ export default function CollectionDetailPage() {
 
             if (response.ok) {
                 const data = await response.json()
+                console.log(data)
                 const assistantMessage: ChatMessage = {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',

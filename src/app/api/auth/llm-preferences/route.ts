@@ -41,9 +41,7 @@ export async function POST(request: NextRequest) {
         }
 
         const { provider, model, apiKeys } = await request.json()
-        console.log("Z llma", provider, model, apiKeys)
 
-        // Get user by email
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
             select: { id: true }
@@ -71,8 +69,6 @@ export async function POST(request: NextRequest) {
                         provider: property
                     }
                 })
-
-                console.log(apiKeyRecord);
 
                 if (apiKeyRecord) {
                     await prisma.apiKey.update({

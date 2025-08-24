@@ -32,7 +32,7 @@ export class VectorDB {
 
     constructor(apiKey?: string) {
 
-        if (process.env.CHROMA_HOST == 'olocalhost') {
+        if (process.env.CHROMA_HOST == 'localhost') {
             this.embeddings = new OllamaEmbeddings({
                 model: 'nomic-embed-text', // or 'all-minilm' for smaller model
                 baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',

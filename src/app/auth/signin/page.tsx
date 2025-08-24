@@ -29,6 +29,7 @@ export default function SignInPage() {
             })
 
             if (result?.error) {
+                console.log('Invalid email');
                 toast({
                     title: 'Error',
                     description: 'Invalid email or password',

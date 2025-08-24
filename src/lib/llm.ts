@@ -1,6 +1,5 @@
 import type { LLMProvider } from '@/types'
 import {ChatOpenAI} from "@langchain/openai";
-import {NextResponse} from "next/server";
 
 export const LLM_PROVIDERS: LLMProvider[] = [
     {
@@ -52,13 +51,6 @@ export const LLM_PROVIDERS: LLMProvider[] = [
 ]
 
 export async function createLLMInstance(provider: LLMProvider, model: string, apiKey?: string) {
-    console.log('Dlaczego kurna', provider)
-    console.log('Teraz jest openai');
-    return new ChatOpenAI({
-        openAIApiKey: apiKey,
-        modelName: model,
-    });
-
     if (provider.type === 'local') {
         const { ChatOllama } = await import('@langchain/community/chat_models/ollama')
         return new ChatOllama({
