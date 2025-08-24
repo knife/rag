@@ -116,7 +116,7 @@ export async function POST(
     console.log(chromaKey);
 
     // Create vector embeddings
-    const vectorDB = new VectorDB(apiKey, chromaKey)
+    const vectorDB = new VectorDB(chromaKey,apiKey)
     const langchainDocs = chunks.map(
       (chunk, index) => new Document({
         pageContent: chunk,
