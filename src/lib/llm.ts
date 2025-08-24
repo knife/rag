@@ -60,7 +60,7 @@ export async function createLLMInstance(provider: LLMProvider, model: string, ap
     } else if (provider.id === 'openai') {
         console.log('Teraz jest openai');
         return new ChatOpenAI({
-            openAIApiKey: apiKey,
+            openAIApiKey: apiKey || 'abc',
             modelName: model,
         })
     } else if (provider.id === 'anthropic') {
