@@ -19,7 +19,7 @@ if (process.env.CHROMA_HOST == 'localhost') {
 
 } else {
     client = new CloudClient({
-        apiKey: process.env.CHROMA_API_KEY,
+        apiKey: process.env.CHROMA_API_KEY || 'abc',
         tenant: '88b5f29d-342c-45dc-98d4-da284f24b1d4',
         database: 'ragdb'
     });
