@@ -78,17 +78,17 @@ export async function POST(
 
 
     // Search for relevant documents
-    const vectorDB = new VectorDB(apiKey)
-    const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
-
-    // Prepare context
-    const context = relevantDocs
-      .map(doc => `Document: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
-      .join('\n\n---\n\n')
-
-      console.log(context);
-    // Get document sources
-    const sources = [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
+    // const vectorDB = new VectorDB(apiKey)
+    // const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
+    //
+    // // Prepare context
+    // const context = relevantDocs
+    //   .map(doc => `Document: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
+    //   .join('\n\n---\n\n')
+    //
+    //   console.log(context);
+    // // Get document sources
+    // const sources = [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
 
     // Create LLM instance and generate response
     // const llm = await createLLMInstance(provider, model, apiKey)
