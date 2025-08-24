@@ -41,7 +41,7 @@ export class VectorDB {
         } else {
             console.log(apiKey)
                 this.embeddings = new OpenAIEmbeddings({
-                    apiKey: apiKey,
+                    apiKey: apiKey || 'abc',
                     batchSize: 512,
                     model: "text-embedding-3-large"
                 });
