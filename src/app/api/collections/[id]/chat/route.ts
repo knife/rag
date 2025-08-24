@@ -78,63 +78,63 @@ export async function POST(
 
 
     // Search for relevant documents
-    // const vectorDB = new VectorDB(apiKey)
-    // const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
-    //
-    // // Prepare context
-    // const context = relevantDocs
-    //   .map(doc => `Document: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
-    //   .join('\n\n---\n\n')
-    //
-    //   console.log(context);
-    // // Get document sources
-    // const sources = [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
+    const vectorDB = new VectorDB(apiKey)
+    const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
+
+    // Prepare context
+    const context = relevantDocs
+      .map(doc => `Document: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
+      .join('\n\n---\n\n')
+
+      console.log(context);
+    // Get document sources
+    const sources = [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
 
     // Create LLM instance and generate response
-    // const llm = await createLLMInstance(provider, model, apiKey)
-    // console.log("to dziala",llm)
-    // const prompt = await CHAT_PROMPT.format({
-    //   context,
-    //   question: message
-    // })
-    //
-    // const response = await llm.invoke(prompt)
-    // const responseContent = typeof response.content === 'string'
-    //   ? response.content
-    //   : response.content.toString()
-    //
-    // // Save chat session and messages (simplified)
-    // let chatSession = await prisma.chatSession.findFirst({
-    //   where: { collectionId: id },
-    //   orderBy: { createdAt: 'desc' }
-    // })
-    //
-    // if (!chatSession) {
-    //   chatSession = await prisma.chatSession.create({
-    //     data: { collectionId: id }
-    //   })
-    // }
-    //
-    // // Save messages
-    // await prisma.chatMessage.createMany({
-    //   data: [
-    //     {
-    //       sessionId: chatSession.id,
-    //       role: 'user',
-    //       content: message,
-    //       sources: []
-    //     },
-    //     {
-    //       sessionId: chatSession.id,
-    //       role: 'assistant',
-    //       content: responseContent,
-    //       sources
-    //     }
-    //   ]
-    // })
+    const llm = await createLLMInstance(provider, model, apiKey)
+    console.log("to dziala",llm)
+    const prompt = await CHAT_PROMPT.format({
+      context,
+      question: message
+    })
+
+    const response = await llm.invoke(prompt)
+    const responseContent = typeof response.content === 'string'
+      ? response.content
+      : response.content.toString()
+
+    // Save chat session and messages (simplified)
+    let chatSession = await prisma.chatSession.findFirst({
+      where: { collectionId: id },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    if (!chatSession) {
+      chatSession = await prisma.chatSession.create({
+        data: { collectionId: id }
+      })
+    }
+
+    // Save messages
+    await prisma.chatMessage.createMany({
+      data: [
+        {
+          sessionId: chatSession.id,
+          role: 'user',
+          content: message,
+          sources: []
+        },
+        {
+          sessionId: chatSession.id,
+          role: 'assistant',
+          content: responseContent,
+          sources
+        }
+      ]
+    })
 
     return NextResponse.json({
-      response: '',
+      response: responseContent,
       sources
     })
   } catch (error) {
