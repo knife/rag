@@ -10,27 +10,29 @@ import { Document } from '@langchain/core/documents'
 import { Chroma } from '@langchain/community/vectorstores/chroma'
 import {OpenAI, OpenAIEmbeddings} from "@langchain/openai";
 
-let client;
 
-if (process.env.CHROMA_HOST == 'localhost') {
-    client = new ChromaClient({
-        path: `http://${process.env.CHROMA_HOST || 'localhost'}:${process.env.CHROMA_PORT || '8000'}`,
-    })
-
-} else {
-    client = new CloudClient({
-        apiKey: process.env.CHROMA_API_KEY || 'abc',
-        tenant: '88b5f29d-342c-45dc-98d4-da284f24b1d4',
-        database: 'ragdb'
-    });
-
-}
 
 
 export class VectorDB {
     private embeddings: OllamaEmbeddings | OpenAIEmbeddings
+    private client: ChromaClient | CloudClient
 
-    constructor(apiKey?: string) {
+    constructor(chromaKey: string, apiKey?: string) {
+
+
+        if (process.env.CHROMA_HOST == 'localhost') {
+            this.client = new ChromaClient({
+                path: `http://${process.env.CHROMA_HOST || 'localhost'}:${process.env.CHROMA_PORT || '8000'}`,
+            })
+
+        } else {
+            this.client = new CloudClient({
+                apiKey: chromaKey || 'abc',
+                tenant: '88b5f29d-342c-45dc-98d4-da284f24b1d4',
+                database: 'ragdb'
+            });
+
+        }
 
         if (process.env.CHROMA_HOST == 'localhost') {
             this.embeddings = new OllamaEmbeddings({
@@ -52,7 +54,7 @@ export class VectorDB {
 
     async createCollection(collectionId: string) {
         try {
-            await client.createCollection({
+            await this.client.createCollection({
                 name: collectionId,
                 metadata: { created_at: new Date().toISOString() }
             })
@@ -99,7 +101,7 @@ export class VectorDB {
 
     async deleteCollection(collectionId: string) {
         try {
-            await client.deleteCollection({ name: collectionId })
+            await this.client.deleteCollection({ name: collectionId })
         } catch (error) {
             console.error('Error deleting collection:', error)
         }

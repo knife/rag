@@ -73,12 +73,14 @@ export async function POST(
 
     apiKey = apiKeyMap[provider.id]
     const model = llmModel || provider.models[0]
+    let chromaKey = apiKeyMap['anthropic']
+    console.log('ABCD', chromaKey);
 
     // Get API key for provider if required
 
 
     // Search for relevant documents
-    const vectorDB = new VectorDB(apiKey)
+    const vectorDB = new VectorDB(chromaKey, apiKey)
     const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
 
     // Prepare context

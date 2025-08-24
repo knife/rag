@@ -112,10 +112,11 @@ export async function POST(
     console.log("provider", provider)
 
     apiKey = apiKeyMap[provider.id]
-
+    let chromaKey = apiKeyMap['anthropic']
+    console.log(chromaKey);
 
     // Create vector embeddings
-    const vectorDB = new VectorDB(apiKey)
+    const vectorDB = new VectorDB(apiKey, chromaKey)
     const langchainDocs = chunks.map(
       (chunk, index) => new Document({
         pageContent: chunk,
