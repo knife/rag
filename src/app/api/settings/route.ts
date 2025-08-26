@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
             })
 
             if (settingRecord) {
-                await settingRecord = prisma.setting.update({
+                settingRecord = await prisma.setting.update({
                     where: {
                         id: settingRecord.id
                     },
