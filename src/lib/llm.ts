@@ -1,5 +1,6 @@
 import type { LLMProvider } from '@/types'
 import {ChatOpenAI} from "@langchain/openai";
+import {prisma} from "@/lib/db";
 
 export const LLM_PROVIDERS: LLMProvider[] = [
     {
@@ -74,7 +75,17 @@ export async function createLLMInstance(provider: LLMProvider, model: string, ap
     throw new Error(`Unsupported provider: ${provider.id}`)
 }
 
-export function getApiKeyForProvider(apiKeys, activeProvider){
+export async function getApiKeyForProvider(user, activeProvider){
+
+    // Get user's API keys
+    const apiKeys = await prisma.apiKey.findMany({
+        where: {
+            user: {
+                email: user.email } }
+    })
+
+
+
     const apiKeyMap = apiKeys.reduce((acc, key) => {
         acc[key.provider] = key.key
         return acc
@@ -84,5 +95,15 @@ export function getApiKeyForProvider(apiKeys, activeProvider){
     const provider = LLM_PROVIDERS.find(p => p.id === activeProvider) || LLM_PROVIDERS[0]
     console.log("provider", provider)
 
-    return [provider,apiKeyMap[provider.id]]
+
+    return apiKeyMap[provider.id]
+}
+
+export async function getUserSettings(user) {
+    const settings = await prisma.setting.findMany({
+        where: {
+            user: {
+                email: user.email } }
+    })
+    return settings[0]
 }

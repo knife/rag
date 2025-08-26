@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { VectorDB } from '@/lib/vectordb'
 import pdfParse from 'pdf-parse'
-import { getApiKeyForProvider, LLM_PROVIDERS } from '@/lib/llm'
+import {getApiKeyForProvider, getUserSettings, LLM_PROVIDERS} from '@/lib/llm'
 import { Document } from '@langchain/core/documents'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 
@@ -91,35 +91,19 @@ export async function POST(
     })
 
 
-    // Get user's API keys
-    const apiKeys = await prisma.apiKey.findMany({
-      where: {
-        user: {
-          email: session.user.email } }
-    })
 
+    // Get API key for provider if required
+    const apiKey= await getApiKeyForProvider(session.user,llmProvider)
+    const settings = await getUserSettings(session.user)
 
-    let apiKey: string | undefined
-
-    const apiKeyMap = apiKeys.reduce((acc, key) => {
-      acc[key.provider] = key.key
-      return acc
-    }, {} as Record<string, string>)
-
-    // Find LLM provider
-    console.log(llmProvider);
-    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
-    console.log("provider", provider)
-
-    apiKey = apiKeyMap[provider.id]
-    let chromaKey = apiKeyMap['anthropic']
-    console.log(chromaKey);
+    // Search for relevant documents
+    const vectorDB = new VectorDB({openAiApiKey: apiKey, ...settings})
 
     // Create vector embeddings
-    const vectorDB = new VectorDB(chromaKey,apiKey)
     const langchainDocs = chunks.map(
       (chunk, index) => new Document({
         pageContent: chunk,
+        id: document.id + "_" + index,
         metadata: {
           documentId: document.id,
           chunkIndex: index,

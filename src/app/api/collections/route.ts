@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { VectorDB } from '@/lib/vectordb'
+import {getApiKeyForProvider, getUserSettings} from "@/lib/llm";
 
 export async function GET() {
     try {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { name, description } = await request.json()
+        const { name, description, llmProvider } = await request.json()
         const user = await prisma.user.findFirst({where: { email: session.user.email }})
 
         if (!name?.trim()) {
@@ -51,8 +52,16 @@ export async function POST(request: NextRequest) {
                 include: {documents: true}
             })
 
+
+            // Get API key for provider if required
+            const apiKey= await getApiKeyForProvider(session.user,llmProvider)
+            const settings = await getUserSettings(session.user)
+
+            // Search for relevant documents
+            const vectorDB = new VectorDB({openAiApiKey: apiKey, ...settings})
+
+
         // Create vector database collection
-        const vectorDB = new VectorDB()
         await vectorDB.createCollection(collection.id)
 
         return NextResponse.json(collection, { status: 201 })

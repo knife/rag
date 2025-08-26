@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { VectorDB } from '@/lib/vectordb'
-import { createLLMInstance, getApiKeyForProvider, LLM_PROVIDERS } from '@/lib/llm'
+import {createLLMInstance, getApiKeyForProvider, getUserSettings, LLM_PROVIDERS} from '@/lib/llm'
 import { PromptTemplate } from '@langchain/core/prompts'
 
 const CHAT_PROMPT = PromptTemplate.fromTemplate(`
@@ -53,47 +53,28 @@ export async function POST(
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
-    // Get user's API keys
-    const apiKeys = await prisma.apiKey.findMany({
-      where: {
-        user: {
-          email: session.user.email } }
-    })
-
-    let apiKey: string | undefined
-
-    const apiKeyMap = apiKeys.reduce((acc, key) => {
-      acc[key.provider] = key.key
-      return acc
-    }, {} as Record<string, string>)
-
-    // Find LLM provider
-    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
-    console.log("provider", provider)
-
-    apiKey = apiKeyMap[provider.id]
-    const model = llmModel || provider.models[0]
-    let chromaKey = apiKeyMap['anthropic']
-    console.log('ABCD', chromaKey);
-
     // Get API key for provider if required
+    const apiKey= await getApiKeyForProvider(session.user,llmProvider)
+    const settings = await getUserSettings(session.user)
 
+    const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
 
     // Search for relevant documents
-    const vectorDB = new VectorDB(chromaKey, apiKey)
+    const vectorDB = new VectorDB({openAiApiKey: apiKey, ...settings})
     const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
 
     // Prepare context
-    const context = relevantDocs
-      .map(doc => `Document: ${doc.metadata.source}\nContent: ${doc.pageContent}`)
+    const context = relevantDocs.documents
+      .map((doc) => `Document: \nContent: ${doc}`)
       .join('\n\n---\n\n')
 
       console.log(context);
     // Get document sources
-    const sources = [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
+    const sources =[] // [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
 
     // Create LLM instance and generate response
-    const llm = await createLLMInstance(provider, model, apiKey)
+    console.log(provider, llmModel);
+    const llm = await createLLMInstance(provider, llmModel, apiKey)
     console.log("to dziala",llm)
     const prompt = await CHAT_PROMPT.format({
       context,

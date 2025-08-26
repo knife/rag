@@ -13,6 +13,9 @@ export function LLMSelector() {
     const { selectedProvider, selectedModel, setSelectedProvider, setSelectedModel, apiKeys, setApiKey } = useLLM()
     const [isOpen, setIsOpen] = useState(false)
     const [tempApiKeys, setTempApiKeys] = useState<Record<string, string>>(apiKeys)
+    const [chromaApiKey, setChromaApiKey] = useState("")
+    const [chromaTenant, setChromaTenant] = useState("")
+    const [chromaDatabase, setChromaDatabase] = useState("")
 
     const handleSaveApiKeys = () => {
         Object.entries(tempApiKeys).forEach(([provider, key]) => {
@@ -65,16 +68,16 @@ export function LLMSelector() {
                                 }}
                             >
                                 <SelectTrigger>
-                                    <SelectValue />
+                                    <SelectValue/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     {LLM_PROVIDERS.map((provider) => (
                                         <SelectItem key={provider.id} value={provider.id}>
                                             <div className="flex items-center space-x-2">
                                                 {provider.type === 'local' ? (
-                                                    <Cpu className="w-4 h-4 text-green-600" />
+                                                    <Cpu className="w-4 h-4 text-green-600"/>
                                                 ) : (
-                                                    <Cloud className="w-4 h-4 text-blue-600" />
+                                                    <Cloud className="w-4 h-4 text-blue-600"/>
                                                 )}
                                                 <span>{provider.name}</span>
                                             </div>
@@ -93,7 +96,7 @@ export function LLMSelector() {
                                     onValueChange={setSelectedModel}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue />
+                                        <SelectValue/>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {selectedProvider.models.map((model) => (
@@ -109,7 +112,7 @@ export function LLMSelector() {
                         {/* API Keys */}
                         <div>
                             <label className="text-sm font-medium mb-2 block flex items-center">
-                                <Key className="w-4 h-4 mr-2" />
+                                <Key className="w-4 h-4 mr-2"/>
                                 API Keys
                             </label>
                             <div className="space-y-3">
@@ -119,7 +122,7 @@ export function LLMSelector() {
                                             {provider.name}
                                         </label>
                                         <Input
-                                            type="password"
+                                            type="input"
                                             placeholder={`Enter ${provider.name} API key`}
                                             value={tempApiKeys[provider.id] || ''}
                                             onChange={(e) =>
@@ -134,6 +137,28 @@ export function LLMSelector() {
                             </div>
                         </div>
 
+
+                        <div>
+                            <label className="text-sm font-medium mb-2 block flex items-center">
+                                <Key className="w-4 h-4 mr-2"/>
+                                Chroma Keys
+                            </label>
+                            <div className="space-y-3">
+                                    <div key={"chromaKey"}>
+                                        <label className="text-xs text-slate-600 mb-1 block">
+                                            API Key
+                                        </label>
+                                        <Input
+                                            type="input"
+                                            placeholder={`Enter Chroma API key`}
+                                            value={chromaApiKey}
+                                            onChange={(e) =>
+                                                setChromaApiKey(e.target.value)
+                                            }
+                                        />
+                                    </div>
+                            </div>
+                        </div>
                         <div className="flex justify-end space-x-2">
                             <Button variant="outline" onClick={() => setIsOpen(false)}>
                                 Cancel

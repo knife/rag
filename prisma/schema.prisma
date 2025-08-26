@@ -16,6 +16,7 @@ model User {
   llmModel    String? @default("llama2")
   apiKeys   ApiKey[]
   collections Collection[]
+  settings Setting[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -40,6 +41,17 @@ model Collection {
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents   Document[]
   chatSessions ChatSession[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Setting {
+  id          String     @id @default(cuid())
+  chromaApiKey String?
+  chromaTenant String?
+  chromaDatabase String?
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }

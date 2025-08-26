@@ -11,7 +11,7 @@ import { UploadDialog } from '@/components/documents/UploadDialog'
 import { Button } from '@/components/ui/button'
 import { LLMSelector } from '@/components/llm/LLMSelector'
 import { useParams } from 'next/navigation'
-import {useLLM} from "../../../components/llm/LLMProvider";
+import {useLLM} from "@/components/llm/LLMProvider";
 
 
 

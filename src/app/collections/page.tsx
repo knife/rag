@@ -8,14 +8,22 @@ import { motion } from 'framer-motion'
 import { Collection } from '@/types'
 import { Button } from '@/components/ui/button'
 import { CreateCollectionDialog } from '@/components/collections/CreateCollectionDialog'
+import { SettingsDialog } from '@/components/settings/SetttingsDialog'
 import { LLMSelector } from '@/components/llm/LLMSelector'
+import {useLLM} from "@/components/llm/LLMProvider";
 
 export default function CollectionsPage() {
     const { data: session, status } = useSession()
+    const { selectedProvider, selectedModel, setSelectedProvider, setSelectedModel, apiKeys, setApiKey } = useLLM()
+
     const router = useRouter()
     const [collections, setCollections] = useState<Collection[]>([])
+    const [settings, setSettings] = useState<Record<string, any>>({})
     const [isLoading, setIsLoading] = useState(true)
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+    const [isSetttngsDialogOpen, setIsSettingsDialogOpen] = useState(false)
+
+    let chromaDB
 
     useEffect(() => {
         if (status === 'loading') return
@@ -25,6 +33,11 @@ export default function CollectionsPage() {
         }
         fetchCollections()
     }, [session, status, router])
+
+    useEffect(() => {
+        fetchSettings()
+    }, [session])
+
 
     const fetchCollections = async () => {
         try {
@@ -39,13 +52,27 @@ export default function CollectionsPage() {
             setIsLoading(false)
         }
     }
+    const fetchSettings = async () => {
+        try {
+            const response = await fetch('/api/settings')
+            if (response.ok) {
+                const data = await response.json()
+                console.log('hello', data);
+                setSettings(data[0])
+                chromaDB =  data[0]?.chromaDatabase
+            }
+        } catch (error) {
+            console.error('Error fetching settings:', error)
+        }
+    }
 
     const handleCreateCollection = async (name: string, description: string) => {
         try {
             const response = await fetch('/api/collections', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, description }),
+                body: JSON.stringify({ name, description, llmProvider: selectedProvider }),
+
             })
 
             if (response.ok) {
@@ -56,6 +83,23 @@ export default function CollectionsPage() {
             console.error('Error creating collection:', error)
         }
     }
+
+    const handleSaveSettings = async (chromaApiKey: string, chromaTenant: string, chromaDatabase: string) => {
+        try {
+            const response = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chromaApiKey, chromaTenant, chromaDatabase }),
+            })
+
+            if (response.ok) {
+                setIsSettingsDialogOpen(false)
+            }
+        } catch (error) {
+            console.error('Error saving settings:', error)
+        }
+    }
+
 
     if (status === 'loading' || isLoading) {
         return (
@@ -84,6 +128,12 @@ export default function CollectionsPage() {
                             >
                                 <Plus className="w-4 h-4 mr-2" />
                                 New Collection
+                            </Button>
+                            <Button
+                                onClick={() => setIsSettingsDialogOpen(true)}
+                                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                            >
+                                Settings
                             </Button>
                         </div>
                     </div>
@@ -168,6 +218,14 @@ export default function CollectionsPage() {
                 onClose={() => setIsCreateDialogOpen(false)}
                 onSubmit={handleCreateCollection}
             />
+            <SettingsDialog
+                settings={settings}
+                chromaDB={chromaDB}
+                isOpen={isSetttngsDialogOpen}
+                onClose={() => setIsSettingsDialogOpen(false)}
+                onSubmit={handleSaveSettings}
+            />
+
         </div>
     )
 }

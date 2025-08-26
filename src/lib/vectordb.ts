@@ -1,109 +1,174 @@
-import {ChromaClient, CloudClient} from 'chromadb'
-
-import { OllamaEmbeddings } from '@langchain/ollama'
-
-// Initialize Ollama embeddings
+import { ChromaClient, CloudClient, Collection, OpenAIEmbeddingFunction } from 'chromadb';
+import { Document as LangchainDocument } from '@langchain/core/documents'
 
 
+interface Document {
+    id: string;
+    content: string;
+    metadata?: Record<string, any>;
+}
 
-import { Document } from '@langchain/core/documents'
-import { Chroma } from '@langchain/community/vectorstores/chroma'
-import {OpenAI, OpenAIEmbeddings} from "@langchain/openai";
-
-
-
+interface VectorDBConfig {
+    useCloud?: boolean;
+    chromaApiKey?: string;
+    chromaTenant?: string;
+    chromaDatabase?: string;
+    cloudUrl?: string;
+    embeddingModel?: string;
+    openAiApiKey?: string;
+}
 
 export class VectorDB {
-    private embeddings: OllamaEmbeddings | OpenAIEmbeddings
-    private client: ChromaClient | CloudClient
+    private client: ChromaClient;
+    private embedding: OpenAIEmbeddingFunction;
 
-    constructor(chromaKey: string, apiKey?: string) {
+    constructor(config: VectorDBConfig = {}) {
+        // Initialize embedding function
+        this.embedding = new OpenAIEmbeddingFunction({
+            openai_api_key: config.openAiApiKey || process.env.OPENAI_KEY || '',
+            openai_model: config.embeddingModel || 'text-embedding-3-small'
+        });
 
+        // Initialize ChromaDB client
+        if (process.env.CHROMA_HOST=='localhost') {
 
-        if (process.env.CHROMA_HOST == 'localhost') {
+            // Default to local ChromaDB
             this.client = new ChromaClient({
-                path: `http://${process.env.CHROMA_HOST || 'localhost'}:${process.env.CHROMA_PORT || '8000'}`,
-            })
-
-        } else {
-            this.client = new CloudClient({
-                apiKey: chromaKey || 'abc',
-                tenant: '88b5f29d-342c-45dc-98d4-da284f24b1d4',
-                database: 'ragdb'
+                path: 'http://localhost:8000'
             });
 
-        }
-
-        if (process.env.CHROMA_HOST == 'localhost') {
-            this.embeddings = new OllamaEmbeddings({
-                model: 'nomic-embed-text', // or 'all-minilm' for smaller model
-                baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-            })
-
         } else {
-            console.log(apiKey)
-                this.embeddings = new OpenAIEmbeddings({
-                    apiKey: apiKey || 'abc',
-                    batchSize: 512,
-                    model: "text-embedding-3-large"
-                });
+            if (!config.chromaApiKey ) {
+                throw new Error('Cloud API key and URL are required when using ChromaCloud');
+            }
+
+
+            this.client = new CloudClient({
+                tenant: config.chromaTenant,
+                database: config.chromaDatabase,
+                apiKey: config.chromaApiKey
+            });
         }
     }
 
-
-
-    async createCollection(collectionId: string) {
+    /**
+     * Creates a new collection in the vector database
+     */
+    async createCollection(collectionId: string): Promise<void> {
         try {
             await this.client.createCollection({
                 name: collectionId,
-                metadata: { created_at: new Date().toISOString() }
-            })
+                embeddingFunction: this.embedding
+            });
         } catch (error) {
-            console.error('Error creating collection:', error)
+            if (error instanceof Error && error.message.includes('already exists')) {
+                console.warn(`Collection ${collectionId} already exists`);
+                return;
+            }
+            throw new Error(`Failed to create collection ${collectionId}: ${error}`);
         }
     }
 
-    async addDocuments(collectionId: string, documents: Document[]) {
+    /**
+     * Adds documents to a specific collection
+     */
+    async addDocuments(collectionId: string, documents: LangchainDocument[]): Promise<void> {
         try {
-            const vectorStore = await Chroma.fromDocuments(
-                documents,
-                this.embeddings,
-                {
-                    collectionName: collectionId,
-                    url: `http://${process.env.CHROMA_HOST}:${process.env.CHROMA_PORT}`,
-                }
-            )
-            return vectorStore
+            const collection = await this.client.getCollection({
+                name: collectionId,
+                embeddingFunction: this.embedding
+            });
+
+
+            const ids = documents.map(doc => doc.id);
+            const texts = documents.map(doc => doc.pageContent);
+            const metadatas = documents.map(doc => doc.metadata || {});
+
+            await collection.add({
+                ids,
+                documents: texts,
+                metadatas
+            });
         } catch (error) {
-            console.error('Error adding documents:', error)
-            throw error
+            throw new Error(`Failed to add documents to collection ${collectionId}: ${error}`);
         }
     }
 
-    async searchDocuments(collectionId: string, query: string, k: number = 5) {
+    /**
+     * Searches for similar documents in a collection
+     */
+    async searchDocuments(
+        collectionId: string,
+        query: string,
+        k: number = 5
+    ) {
         try {
-            const vectorStore = await Chroma.fromExistingCollection(
-                this.embeddings,
-                {
-                    collectionName: collectionId,
-                    url: `http://${process.env.CHROMA_HOST}:${process.env.CHROMA_PORT}`,
-                }
-            )
-            console.log(vectorStore);
+            const collection = await this.client.getCollection({
+                name: collectionId,
+                embeddingFunction: this.embedding
+            });
 
-            const results = await vectorStore.similaritySearch(query, k)
+            const results = await collection.query({
+                queryTexts: [query],
+                nResults: k
+            });
             return results
+
         } catch (error) {
-            console.error('Error searching documents:', error)
-            throw error
+            throw new Error(`Failed to search documents in collection ${collectionId}: ${error}`);
         }
     }
 
-    async deleteCollection(collectionId: string) {
+    /**
+     * Deletes a collection from the vector database
+     */
+    async deleteCollection(collectionId: string): Promise<void> {
         try {
-            await this.client.deleteCollection({ name: collectionId })
+            await this.client.deleteCollection({
+                name: collectionId
+            });
         } catch (error) {
-            console.error('Error deleting collection:', error)
+            throw new Error(`Failed to delete collection ${collectionId}: ${error}`);
+        }
+    }
+
+    /**
+     * Lists all available collections
+     */
+    async listCollections(): Promise<string[]> {
+        try {
+            const collections = await this.client.listCollections();
+            return collections.map(collection => collection.name);
+        } catch (error) {
+            throw new Error(`Failed to list collections: ${error}`);
+        }
+    }
+
+    /**
+     * Gets collection info including document count
+     */
+    async getCollectionInfo(collectionId: string): Promise<{
+        name: string;
+        count: number;
+        metadata?: Record<string, any>;
+    }> {
+        try {
+            const collection = await this.client.getCollection({
+                name: collectionId,
+                embeddingFunction: this.embedding
+            });
+
+            const count = await collection.count();
+
+            return {
+                name: collectionId,
+                count,
+                metadata: collection.metadata
+            };
+        } catch (error) {
+            throw new Error(`Failed to get collection info for ${collectionId}: ${error}`);
         }
     }
 }
+
+// Usage examples:
