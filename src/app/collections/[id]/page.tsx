@@ -96,7 +96,7 @@ export default function CollectionDetailPage() {
             const response = await fetch(`/api/collections/${params.id}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message, llmModel: selectedModel, llmProvider: selectedProvider }),
+                body: JSON.stringify({ message: message, llmModel: selectedModel, llmProvider: selectedProvider?.id }),
             })
 
             if (response.ok) {

@@ -2,6 +2,7 @@ import type { LLMProvider } from '@/types'
 import {ChatOpenAI} from "@langchain/openai";
 import {prisma} from "@/lib/db";
 
+
 export const LLM_PROVIDERS: LLMProvider[] = [
     {
         id: 'ollama-smollm2',
@@ -52,7 +53,9 @@ export const LLM_PROVIDERS: LLMProvider[] = [
 ]
 
 export async function createLLMInstance(provider: LLMProvider, model: string, apiKey?: string) {
+    console.log("Tworzę instancje", provider);
     if (provider.type === 'local') {
+
         const { ChatOllama } = await import('@langchain/community/chat_models/ollama')
         return new ChatOllama({
             baseUrl: provider.endpoint,
@@ -93,7 +96,6 @@ export async function getApiKeyForProvider(user, activeProvider){
 
     // Find LLM provider
     const provider = LLM_PROVIDERS.find(p => p.id === activeProvider) || LLM_PROVIDERS[0]
-    console.log("provider", provider)
 
 
     return apiKeyMap[provider.id]

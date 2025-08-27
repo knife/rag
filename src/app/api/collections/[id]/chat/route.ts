@@ -57,6 +57,8 @@ export async function POST(
     const apiKey= await getApiKeyForProvider(session.user,llmProvider)
     const settings = await getUserSettings(session.user)
 
+    console.log("provider dostarczony: ", llmProvider);
+
     const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
 
     // Search for relevant documents
