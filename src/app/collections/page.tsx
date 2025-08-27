@@ -23,7 +23,6 @@ export default function CollectionsPage() {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
     const [isSetttngsDialogOpen, setIsSettingsDialogOpen] = useState(false)
 
-    let chromaDB
 
     useEffect(() => {
         if (status === 'loading') return
@@ -59,7 +58,6 @@ export default function CollectionsPage() {
                 const data = await response.json()
                 console.log('hello', data);
                 setSettings(data[0])
-                chromaDB =  data[0]?.chromaDatabase
             }
         } catch (error) {
             console.error('Error fetching settings:', error)
@@ -220,7 +218,6 @@ export default function CollectionsPage() {
             />
             <SettingsDialog
                 settings={settings}
-                chromaDB={chromaDB}
                 isOpen={isSetttngsDialogOpen}
                 onClose={() => setIsSettingsDialogOpen(false)}
                 onSubmit={handleSaveSettings}

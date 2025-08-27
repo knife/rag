@@ -10,9 +10,9 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ isOpen, onClose, onSubmit, settings }: SettingsDialogProps) {
-    const [chromaApiKey, setChromaApiKey] = useState(settings.chromaApiKey)
-    const [chromaDatabase, setChromaDatabase] = useState(settings.chromaDatabase)
-    const [chromaTenant, setChromaTenant] = useState(settings.chromaTenant)
+    const [chromaApiKey, setChromaApiKey] = useState(settings?.chromaApiKey)
+    const [chromaDatabase, setChromaDatabase] = useState(settings?.chromaDatabase)
+    const [chromaTenant, setChromaTenant] = useState(settings?.chromaTenant)
 
 
     if (!isOpen) return null
