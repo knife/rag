@@ -16,7 +16,7 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         name: 'Llama 2 (Local)',
         type: 'local',
         endpoint: 'http://localhost:11434',
-        models: ['llama2:7b', 'llama2:13b', 'llama2:70b'],
+        models: ['llama2:7b', 'llama3.1:8b'],
         requiresApiKey: false,
     },
     {
@@ -28,11 +28,11 @@ export const LLM_PROVIDERS: LLMProvider[] = [
         requiresApiKey: false,
     },
     {
-        id: 'ollama-codellama',
-        name: 'Code Llama (Local)',
+        id: 'ollama-bielik',
+        name: 'Bielik (Local)',
         type: 'local',
         endpoint: 'http://localhost:11434',
-        models: ['codellama', 'codellama:13b', 'codellama:34b'],
+        models: ['SpeakLeash/bielik-7b-instruct-v0.1-gguf:latest',],
         requiresApiKey: false,
     },
     {

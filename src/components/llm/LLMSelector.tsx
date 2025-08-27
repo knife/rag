@@ -137,28 +137,6 @@ export function LLMSelector() {
                             </div>
                         </div>
 
-
-                        <div>
-                            <label className="text-sm font-medium mb-2 block flex items-center">
-                                <Key className="w-4 h-4 mr-2"/>
-                                Chroma Keys
-                            </label>
-                            <div className="space-y-3">
-                                    <div key={"chromaKey"}>
-                                        <label className="text-xs text-slate-600 mb-1 block">
-                                            API Key
-                                        </label>
-                                        <Input
-                                            type="input"
-                                            placeholder={`Enter Chroma API key`}
-                                            value={chromaApiKey}
-                                            onChange={(e) =>
-                                                setChromaApiKey(e.target.value)
-                                            }
-                                        />
-                                    </div>
-                            </div>
-                        </div>
                         <div className="flex justify-end space-x-2">
                             <Button variant="outline" onClick={() => setIsOpen(false)}>
                                 Cancel
