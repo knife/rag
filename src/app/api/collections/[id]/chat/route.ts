@@ -63,7 +63,7 @@ export async function POST(
 
     // Search for relevant documents
     const vectorDB = new VectorDB({openAiApiKey: apiKey, ...settings})
-    const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
+    const relevantDocs = await vectorDB.searchDocuOlamaments(id, message, 5)
 
     // Prepare context
     const context = relevantDocs.documents
