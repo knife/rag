@@ -18,12 +18,13 @@ interface Props {
 
 export function ChatInterface({ messages, onSendMessage, documents, isLoading = false }: Props) {
     const [input, setInput] = useState('')
-    const [isTyping, setIsTyping] = useState(false)
+    const [isTyping, setIsTyping] = useState(isLoading)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        if ((messages.length > 0) && messages[messages.length-1]?.role == 'assistant')  setIsTyping(false)
     }, [messages])
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -145,7 +146,7 @@ export function ChatInterface({ messages, onSendMessage, documents, isLoading = 
                 )}
 
                 {/* Typing Indicator */}
-                {isLoading && (
+                {isTyping && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

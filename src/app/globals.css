@@ -20,6 +20,18 @@
   background-color: rgb(var(--background-color))
 }
 
+.text-primary-foreground {
+  color: white;
+}
+
+.bg-secondary {
+  @apply bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700
+}
+
+.bg-primary {
+  @apply bg-blue-500
+}
+
 .text-foreground {
   color: rgb(var(--foreground-rgb))
 }

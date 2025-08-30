@@ -4,19 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { VectorDB } from '@/lib/vectordb'
 import {createLLMInstance, getApiKeyForProvider, getUserSettings, LLM_PROVIDERS} from '@/lib/llm'
-import { PromptTemplate } from '@langchain/core/prompts'
+import {Prompter} from "@/lib/prompter";
 
-const CHAT_PROMPT = PromptTemplate.fromTemplate(`
-You are a helpful AI assistant that answers questions based on the provided context from documents.
-
-Context from documents:
-{context}
-
-Question: {question}
-
-Please provide a helpful and accurate answer based on the context above. If the context doesn't contain enough information to answer the question, please say so clearly. Always cite which documents you're referencing when possible.
-
-Answer:`)
 
 export async function POST(
   request: NextRequest,
@@ -47,7 +36,6 @@ export async function POST(
     }
 
     const { message, llmProvider, llmModel } = await request.json()
-    console.log(llmProvider, llmModel)
 
     if (!message?.trim()) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
@@ -56,34 +44,19 @@ export async function POST(
     // Get API key for provider if required
     const apiKey= await getApiKeyForProvider(session.user,llmProvider)
     const settings = await getUserSettings(session.user)
-
-    console.log("provider dostarczony: ", llmProvider);
-
     const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
+    const llm = await createLLMInstance(provider, llmModel, apiKey)
 
     // Search for relevant documents
     const vectorDB = new VectorDB({openAiApiKey: apiKey, ...settings})
     const relevantDocs = await vectorDB.searchDocuments(id, message, 5)
 
-    // Prepare context
-    const context = relevantDocs.documents
-      .map((doc) => `Document: \nContent: ${doc}`)
-      .join('\n\n---\n\n')
+    const sources = [...new Set(relevantDocs.metadatas[0].map((metadata) => metadata?.documentId))]
 
-      console.log(context);
-    // Get document sources
-    const sources =[] // [...new Set(relevantDocs.map(doc => doc.metadata.documentId))]
+    const prompter = new Prompter(llm, relevantDocs)
+    const response = await prompter.send(message)
 
-    // Create LLM instance and generate response
-    console.log(provider, llmModel);
-    const llm = await createLLMInstance(provider, llmModel, apiKey)
-    console.log("to dziala",llm)
-    const prompt = await CHAT_PROMPT.format({
-      context,
-      question: message
-    })
 
-    const response = await llm.invoke(prompt)
     const responseContent = typeof response.content === 'string'
       ? response.content
       : response.content.toString()

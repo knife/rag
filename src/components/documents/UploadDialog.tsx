@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 interface Props {
     isOpen: boolean
     onClose: () => void
-    onUpload: (file?: File, text?: string) => void
+    onUpload: (file?: File, text?: string, title?: string) => void
 }
 
 export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
@@ -37,7 +37,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
         if (uploadType === 'file' && selectedFile) {
             onUpload(selectedFile)
         } else if (uploadType === 'text' && textContent.trim()) {
-            onUpload(undefined, textContent)
+            onUpload(undefined, textContent, textTitle)
         }
 
         // Reset form

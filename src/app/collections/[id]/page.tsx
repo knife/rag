@@ -55,7 +55,7 @@ export default function CollectionDetailPage() {
         }
     }
 
-    const handleDocumentUpload = async (file: File, text?: string) => {
+    const handleDocumentUpload = async (file: File, text?: string, name?: string) => {
         try {
             const formData = new FormData()
             if (file) {
@@ -63,7 +63,7 @@ export default function CollectionDetailPage() {
             }
             if (text) {
                 formData.append('text', text)
-                formData.append('name', 'Text Document')
+                formData.append('name', name)
 
             }
             formData.append('llmProvider', selectedProvider.id)
