@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { LLMSelector } from '@/components/llm/LLMSelector'
 import { useParams } from 'next/navigation'
 import {useLLM} from "@/components/llm/LLMProvider";
+import {getDictionary} from "@/app/dict";
 
 
 
@@ -29,6 +30,7 @@ export default function CollectionDetailPage() {
 
     const params = useParams<{ id: string }>()
 
+    const dict = getDictionary('pl')
 
     useEffect(() => {
         if (status === 'loading') return
@@ -149,7 +151,7 @@ export default function CollectionDetailPage() {
                                 onClick={() => router.push('/collections')}
                                 className="text-slate-600 hover:text-slate-900"
                             >
-                                ← Back
+                                ← {dict.buttons.back}
                             </Button>
                             <div>
                                 <h1 className="text-xl font-bold text-slate-900">{collection.name}</h1>
@@ -165,7 +167,7 @@ export default function CollectionDetailPage() {
                                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                             >
                                 <Upload className="w-4 h-4 mr-2" />
-                                Upload Document
+                                {dict.buttons.upload_document}
                             </Button>
                         </div>
                     </div>
@@ -179,7 +181,7 @@ export default function CollectionDetailPage() {
                     <div className="p-4 border-b border-slate-200">
                         <h2 className="font-semibold text-lg text-slate-900 flex items-center">
                             <FileText className="w-5 h-5 mr-2" />
-                            Documents ({documents.length})
+                            {dict.pages.chat.documents} ({documents.length})
                         </h2>
                     </div>
 
@@ -201,7 +203,7 @@ export default function CollectionDetailPage() {
                     <div className="p-4 bg-white border-b border-slate-200">
                         <h2 className="font-semibold text-lg text-slate-900 flex items-center">
                             <MessageSquare className="w-5 h-5 mr-2" />
-                            Chat with Documents
+                            {dict.pages.chat.chat_with_documents}
                         </h2>
                     </div>
 

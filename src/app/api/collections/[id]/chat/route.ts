@@ -42,7 +42,7 @@ export async function POST(
     }
 
     // Get API key for provider if required
-    const apiKey= await getApiKeyForProvider(session.user,llmProvider)
+    const apiKey = await getApiKeyForProvider(session.user, llmProvider)
     const settings = await getUserSettings(session.user)
     const provider = LLM_PROVIDERS.find(p => p.id === llmProvider) || LLM_PROVIDERS[0]
     const llm = await createLLMInstance(provider, llmModel, apiKey)

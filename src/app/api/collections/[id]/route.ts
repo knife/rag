@@ -75,9 +75,16 @@ export async function DELETE(
 
         // Delete from vector database
         const vectorDB = new VectorDB()
-        await vectorDB.deleteCollection(id)
+        try {
+            await vectorDB.deleteCollection(id)
+        } catch(error) {
+           console.log(error)
+        }
 
-        // Delete from main database
+        await prisma.document.deleteMany({
+            where: { collectionId: id }
+        })
+
         await prisma.collection.delete({
             where: { id: id }
         })

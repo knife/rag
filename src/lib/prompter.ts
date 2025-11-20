@@ -8,7 +8,7 @@ Context from documents:
 
 Question: {question}
 
-Please provide a helpful and accurate answer based on the context above. If the context doesn't contain enough information to answer the question, please say so clearly. Always cite which documents you're referencing when possible.
+Please provide a helpful and accurate answer based on the context above. If the context doesn't contain enough information to answer the question, please say so clearly.
 
 Answer:`)
 

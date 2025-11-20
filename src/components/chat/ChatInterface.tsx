@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown'
 import { ChatMessage, Document } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import {getDictionary} from "@/app/dict";
 
 interface Props {
     messages: ChatMessage[]
@@ -15,6 +16,8 @@ interface Props {
     documents: Document[]
     isLoading?: boolean
 }
+
+const dict = getDictionary('pl')
 
 export function ChatInterface({ messages, onSendMessage, documents, isLoading = false }: Props) {
     const [input, setInput] = useState('')
@@ -62,13 +65,13 @@ export function ChatInterface({ messages, onSendMessage, documents, isLoading = 
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-slate-400">
                         <Bot className="w-16 h-16 mb-4" />
-                        <h3 className="text-lg font-medium mb-2">Start a conversation</h3>
+                        <h3 className="text-lg font-medium mb-2">{dict.pages.chat.start_conversation}</h3>
                         <p className="text-sm text-center max-w-md">
-                            Ask questions about your documents. I'll search through them and provide relevant answers.
+                            {dict.pages.chat.start_conversation_help}
                         </p>
                         {documents.length === 0 && (
                             <p className="text-xs mt-4 text-amber-600">
-                                Upload documents first to get started!
+                                {dict.pages.chat.start_conversation_no_docs}
                             </p>
                         )}
                     </div>
@@ -182,7 +185,7 @@ export function ChatInterface({ messages, onSendMessage, documents, isLoading = 
                                 adjustTextareaHeight()
                             }}
                             onKeyDown={handleKeyDown}
-                            placeholder="Ask a question about your documents..."
+                            placeholder={dict.pages.chat.input_prompt}
                             className="resize-none pr-12 min-h-[44px] max-h-[120px]"
                             disabled={isLoading || documents.length === 0}
                         />
@@ -199,7 +202,7 @@ export function ChatInterface({ messages, onSendMessage, documents, isLoading = 
 
                 {documents.length === 0 && (
                     <p className="text-xs text-amber-600 mt-2">
-                        Upload documents to start chatting
+                        {dict.pages.chat.upload_files}
                     </p>
                 )}
             </div>

@@ -49,12 +49,12 @@ export async function POST(request: NextRequest) {
                     description: description?.trim(),
                     userId: user.id,
                 },
-                include: {documents: true}
+                include: { documents: true }
             })
 
 
             // Get API key for provider if required
-            const apiKey= await getApiKeyForProvider(session.user,llmProvider)
+            const apiKey = await getApiKeyForProvider(session.user, 'openai')
             const settings = await getUserSettings(session.user)
 
             // Search for relevant documents

@@ -1,4 +1,4 @@
-import { ChromaClient, CloudClient, Collection, OpenAIEmbeddingFunction } from 'chromadb';
+import { ChromaClient, CloudClient, OpenAIEmbeddingFunction, DefaultEmbeddingFunction } from 'chromadb';
 import { Document as LangchainDocument } from '@langchain/core/documents'
 
 
@@ -20,17 +20,15 @@ interface VectorDBConfig {
 
 export class VectorDB {
     private client: ChromaClient;
-    private embedding: OpenAIEmbeddingFunction;
+    private embedding: OpenAIEmbeddingFunction | DefaultEmbeddingFunction;
 
     constructor(config: VectorDBConfig = {}) {
         // Initialize embedding function
-        this.embedding = new OpenAIEmbeddingFunction({
-            openai_api_key: config.openAiApiKey || process.env.OPENAI_KEY || '',
-            openai_model: config.embeddingModel || 'text-embedding-3-small'
-        });
 
         // Initialize ChromaDB client
         if (process.env.CHROMA_HOST=='localhost') {
+
+            this.embedding = new DefaultEmbeddingFunction();
 
             // Default to local ChromaDB
             this.client = new ChromaClient({
@@ -42,6 +40,10 @@ export class VectorDB {
                 throw new Error('Cloud API key and URL are required when using ChromaCloud');
             }
 
+            this.embedding = new OpenAIEmbeddingFunction({
+                openai_api_key: config.openAiApiKey || process.env.OPENAI_KEY || '',
+                openai_model: config.embeddingModel || 'text-embedding-3-small'
+            });
 
             this.client = new CloudClient({
                 tenant: config.chromaTenant,
@@ -131,6 +133,22 @@ export class VectorDB {
             throw new Error(`Failed to delete collection ${collectionId}: ${error}`);
         }
     }
+
+    /**
+     * Deletes a collection from the vector database
+     */
+    async deleteDocuments(collectionId: string, ids: string[]): Promise<void> {
+        try {
+            const collection = await client.getCollection({ name: collectionId });
+
+            await collection.delete({
+                ids: ids
+            });
+        } catch (error) {
+            throw new Error(`Failed to delete collection ${collectionId}: ${error}`);
+        }
+    }
+
 
     /**
      * Lists all available collections

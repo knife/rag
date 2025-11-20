@@ -19,9 +19,7 @@ export async function GET() {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        // Parse LLM preferences from JSON
         const defaultPrefs = { provider: 'ollama', model: 'llama2', apiKeys: {} }
-
 
         return NextResponse.json({
             provider: user.llmProvider || defaultPrefs.provider,
@@ -61,7 +59,6 @@ export async function POST(request: NextRequest) {
 
         if (apiKeys) {
             for (const property in apiKeys) {
-                console.log(property,apiKeys[property])
 
                 const apiKeyRecord = await prisma.apiKey.findFirst({
                     where: {

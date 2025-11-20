@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Plus, Folder, Calendar, FileText } from 'lucide-react'
+import {Plus, Folder, Calendar, FileText, Trash2} from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Collection } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,8 @@ import { CreateCollectionDialog } from '@/components/collections/CreateCollectio
 import { SettingsDialog } from '@/components/settings/SetttingsDialog'
 import { LLMSelector } from '@/components/llm/LLMSelector'
 import {useLLM} from "@/components/llm/LLMProvider";
+import { getDictionary } from '@/app/dict'
+import {useToast} from "@/components/ui/use-toast";
 
 export default function CollectionsPage() {
     const { data: session, status } = useSession()
@@ -23,6 +25,9 @@ export default function CollectionsPage() {
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
     const [isSetttngsDialogOpen, setIsSettingsDialogOpen] = useState(false)
 
+    const { toast } = useToast()
+
+    const dict = getDictionary('pl') // en
 
     useEffect(() => {
         if (status === 'loading') return
@@ -37,6 +42,34 @@ export default function CollectionsPage() {
         fetchSettings()
     }, [session])
 
+
+    const onDeleteCollection = async (collection) => {
+        try {
+            const response = await fetch('/api/collections/' + collection.id, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ llmProvider: selectedProvider }),
+            })
+
+            if (response.ok) {
+                toast({
+                    title: 'Success',
+                    description: 'Collection has been removed.',
+                })
+
+                await fetchCollections()
+
+            } else {
+                toast({
+                    title: 'Error',
+                    description: 'There was an error while removing collection.',
+                    variant: 'destructive',
+                })
+            }
+        } catch (error) {
+            console.error('Error creating collection:', error)
+        }
+    };
 
     const fetchCollections = async () => {
         try {
@@ -56,7 +89,6 @@ export default function CollectionsPage() {
             const response = await fetch('/api/settings')
             if (response.ok) {
                 const data = await response.json()
-                console.log('hello', data);
                 setSettings(data[0])
             }
         } catch (error) {
@@ -70,7 +102,6 @@ export default function CollectionsPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, description, llmProvider: selectedProvider }),
-
             })
 
             if (response.ok) {
@@ -81,6 +112,7 @@ export default function CollectionsPage() {
             console.error('Error creating collection:', error)
         }
     }
+
 
     const handleSaveSettings = async (chromaApiKey: string, chromaTenant: string, chromaDatabase: string) => {
         try {
@@ -115,7 +147,7 @@ export default function CollectionsPage() {
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center space-x-4">
                             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                RAG Assistant
+                                {dict.app.name}
                             </h1>
                         </div>
                         <div className="flex items-center space-x-4">
@@ -125,13 +157,13 @@ export default function CollectionsPage() {
                                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                             >
                                 <Plus className="w-4 h-4 mr-2" />
-                                New Collection
+                                {dict.buttons.new_collection}
                             </Button>
                             <Button
                                 onClick={() => setIsSettingsDialogOpen(true)}
                                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                             >
-                                Settings
+                                {dict.buttons.settings}
                             </Button>
                         </div>
                     </div>
@@ -142,10 +174,10 @@ export default function CollectionsPage() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                        Document Collections
+                        {dict.pages.collections.title}
                     </h2>
                     <p className="text-slate-600">
-                        Organize your documents into collections and chat with them using AI
+                        {dict.pages.collections.subtitle}
                     </p>
                 </div>
 
@@ -153,17 +185,17 @@ export default function CollectionsPage() {
                     <div className="text-center py-12">
                         <Folder className="mx-auto h-24 w-24 text-slate-300 mb-4" />
                         <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                            No collections yet
+                            {dict.pages.collections.no_collections}
                         </h3>
                         <p className="text-slate-600 mb-6">
-                            Create your first collection to start organizing documents
+                            {dict.pages.collections.new_collection}
                         </p>
                         <Button
                             onClick={() => setIsCreateDialogOpen(true)}
                             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                         >
                             <Plus className="w-4 h-4 mr-2" />
-                            Create Collection
+                            {dict.pages.collections.create_collection}
                         </Button>
                     </div>
                 ) : (
@@ -185,7 +217,7 @@ export default function CollectionsPage() {
                                         <div className="text-right">
                                             <div className="flex items-center text-sm text-slate-500">
                                                 <FileText className="w-4 h-4 mr-1" />
-                                                {collection.documents?.length || 0} docs
+                                                {collection.documents?.length || 0} {dict.pages.collections.documents}
                                             </div>
                                         </div>
                                     </div>
@@ -203,6 +235,18 @@ export default function CollectionsPage() {
                                     <div className="flex items-center text-xs text-slate-500">
                                         <Calendar className="w-3 h-3 mr-1" />
                                         {new Date(collection.createdAt).toLocaleDateString()}
+
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                onDeleteCollection(collection)
+                                            }}
+                                            className="h-6 w-6 p-0 text-slate-500 hover:text-red-700"
+                                        >
+                                            <Trash2 className="w-3 h-3" />
+                                        </Button>
                                     </div>
                                 </div>
                             </motion.div>

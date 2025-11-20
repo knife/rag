@@ -39,7 +39,8 @@ Aplikacja jest dostępna pod adresem [http://localhost:3000](http://localhost:30
 1. Należy utworzyć konto na stronie (https://rag-blond.vercel.app/)
 2. Następnie należy utworzyć bazę danych w Chroma Cloud i zapisać dane konfiguracyjne
 3. Potrzebne jest także konto na platformie OpenAI i klucz do OpenAIAPI
-4. Wklejamy klucz i dane konfiguracyjne ChormaDB cloud po kliknięciu w przcisku settings
+4. Wklejamy klucz i dane konfiguracyjne ChormaDB cloud po kliknięciu w przcisku Settings
 5. Wklemajmy klucz OpenAi w okienku wyboru modelu LLM
-6. Teraz możemy tworzyć kolekcje i uploadować dokumenty
+6. Wybieramy OpenAI GPT 
+6. Teraz możemy tworzyć kolekcje i uploadować dokumenty https://rag-blond.vercel.app/collections
 7. Po wejściu na stronę kolekcji możemy rozpocząć czat.
