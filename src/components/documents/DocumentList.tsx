@@ -5,6 +5,7 @@ import { FileText, File, Eye, Trash2, Calendar } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Document } from '@/types'
 import { Button } from '@/components/ui/button'
+import {getDictionary} from "@/app/dict";
 
 interface Props {
     documents: Document[]
@@ -23,11 +24,13 @@ export function DocumentList({
                              }: Props) {
     const [hoveredDoc, setHoveredDoc] = useState<string | null>(null)
 
+    const dict = getDictionary('pl')
+
     if (documents.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-64 text-slate-400">
                 <FileText className="w-16 h-16 mb-4" />
-                <p className="text-sm">No documents uploaded yet</p>
+                <p className="text-sm">{dict.pages.chat.no_documents} </p>
             </div>
         )
     }

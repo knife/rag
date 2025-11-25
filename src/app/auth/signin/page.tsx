@@ -8,6 +8,7 @@ import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
+import { getDictionary } from "@/app/dict";
 
 export default function SignInPage() {
     const [email, setEmail] = useState('')
@@ -16,6 +17,8 @@ export default function SignInPage() {
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
     const { toast } = useToast()
+
+    const dict = getDictionary('pl')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -32,13 +35,13 @@ export default function SignInPage() {
                 console.log('Invalid email');
                 toast({
                     title: 'Error',
-                    description: 'Invalid email or password',
+                    description: dict.toast.sign_in_invalid_creds,
                     variant: 'destructive',
                 })
             } else {
                 toast({
                     title: 'Success',
-                    description: 'Signed in successfully',
+                    description: dict.toast.sign_in_success
                 })
                 router.push('/collections')
                 router.refresh()
@@ -46,7 +49,7 @@ export default function SignInPage() {
         } catch (error) {
             toast({
                 title: 'Error',
-                description: 'Something went wrong',
+                description: dict.toast.general_error,
                 variant: 'destructive',
             })
         } finally {
@@ -60,22 +63,22 @@ export default function SignInPage() {
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                            RAG Assistant
+                          {dict.app.full_name}
                         </h1>
-                        <p className="text-slate-600">Sign in to your account</p>
+                        <p className="text-slate-600">{dict.pages.sign_in.title}</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                                Email
+                                {dict.pages.sign_in.email}
                             </label>
                             <Input
                                 id="email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Enter your email"
+                                placeholder={dict.pages.sign_up.email_placeholder}
                                 required
                                 disabled={isLoading}
                             />
@@ -83,7 +86,7 @@ export default function SignInPage() {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                                Password
+                                {dict.pages.sign_in.password}
                             </label>
                             <div className="relative">
                                 <Input
@@ -91,7 +94,7 @@ export default function SignInPage() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter your password"
+                                    placeholder={dict.pages.sign_up.password_placeholder}
                                     required
                                     disabled={isLoading}
                                     className="pr-10"
@@ -116,18 +119,18 @@ export default function SignInPage() {
                             ) : (
                                 <LogIn className="w-4 h-4 mr-2" />
                             )}
-                            Sign In
+                            {dict.pages.sign_in.signin}
                         </Button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-slate-600">
-                            Don't have an account?{' '}
+                            {dict.pages.sign_in.dont_have_account} {' '}
                             <Link
                                 href="/auth/signup"
                                 className="font-medium text-blue-600 hover:text-blue-500"
                             >
-                                Sign up
+                                {dict.pages.sign_in.signup}
                             </Link>
                         </p>
                     </div>

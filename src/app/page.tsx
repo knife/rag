@@ -7,12 +7,15 @@ import Link from 'next/link'
 import { User, Mail, LogOut, Settings, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
+import {getDictionary} from "@/app/dict";
 
 export default function Home() {
     const { data: session, status } = useSession()
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
     const { toast } = useToast()
+
+    const dict = getDictionary('pl')
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -31,14 +34,14 @@ export default function Home() {
 
             toast({
                 title: 'Success',
-                description: 'Signed out successfully',
+                description: dict.toast.sign_out
             })
 
             router.push('/auth/signin')
         } catch (error) {
             toast({
                 title: 'Error',
-                description: 'Something went wrong during sign out',
+                description: dict.toast.sign_out_error,
                 variant: 'destructive',
             })
         } finally {
@@ -51,7 +54,7 @@ export default function Home() {
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
                 <div className="flex flex-col items-center space-y-4">
                     <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-slate-600">Loading user information...</p>
+                    <p className="text-slate-600">{dict.pages.account.loading_info}</p>
                 </div>
             </div>
         )
@@ -72,10 +75,10 @@ export default function Home() {
                             className="flex items-center text-slate-600 hover:text-slate-900 transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Collections
+                            {dict.pages.account.back_to_collections}
                         </Link>
                         <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Account Information
+                            {dict.pages.account.account_info_header}
                         </h1>
                         <div></div>
                     </div>
@@ -104,7 +107,7 @@ export default function Home() {
                                     {session.user?.name || 'User Profile'}
                                 </h2>
                                 <p className="text-blue-100">
-                                    Welcome to RAG Assistant
+                                    {dict.pages.account.welcome_header}
                                 </p>
                             </div>
                         </div>
@@ -119,7 +122,7 @@ export default function Home() {
                                     <Mail className="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="font-medium text-slate-900 mb-1">Email Address</h3>
+                                    <h3 className="font-medium text-slate-900 mb-1">{ dict.pages.account.email_address }</h3>
                                     <p className="text-slate-600">
                                         {session.user?.email || 'No email provided'}
                                     </p>
@@ -141,7 +144,7 @@ export default function Home() {
                                 ) : (
                                     <LogOut className="w-4 h-4 mr-2" />
                                 )}
-                                Sign Out
+                                {dict.pages.account.signout}
                             </Button>
                         </div>
                     </div>
@@ -149,7 +152,7 @@ export default function Home() {
 
                 {/* Additional Info Card */}
                 <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
-                    <h3 className="font-semibold text-slate-900 mb-3">Quick Actions</h3>
+                    <h3 className="font-semibold text-slate-900 mb-3">{ dict.pages.account.quick_actions }</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <Link
                             href="/collections"
@@ -158,7 +161,7 @@ export default function Home() {
                             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                                 <User className="w-4 h-4 text-blue-600" />
                             </div>
-                            <span className="text-sm font-medium text-slate-700">My Collections</span>
+                            <span className="text-sm font-medium text-slate-700">{ dict.pages.account.my_collections }</span>
                         </Link>
 
                         <Link
@@ -168,7 +171,7 @@ export default function Home() {
                             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                                 <Settings className="w-4 h-4 text-green-600" />
                             </div>
-                            <span className="text-sm font-medium text-slate-700">Help & Support</span>
+                            <span className="text-sm font-medium text-slate-700">{dict.pages.account.help_support}</span>
                         </Link>
                     </div>
                 </div>

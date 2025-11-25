@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import {getDictionary} from "@/app/dict";
 
 interface Props {
     isOpen: boolean
@@ -19,6 +20,8 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
     const [textContent, setTextContent] = useState('')
     const [textTitle, setTextTitle] = useState('')
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
+    const dict = getDictionary('pl')
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
@@ -59,7 +62,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Upload Document</DialogTitle>
+                    <DialogTitle>{dict.modals.upload_title}</DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4">
@@ -71,7 +74,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
                             className="flex-1"
                         >
                             <Upload className="w-4 h-4 mr-2" />
-                            Upload File
+                            {dict.modals.upload_file}
                         </Button>
                         <Button
                             variant={uploadType === 'text' ? 'default' : 'outline'}
@@ -79,7 +82,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
                             className="flex-1"
                         >
                             <FileText className="w-4 h-4 mr-2" />
-                            Add Text
+                            {dict.modals.add_text}
                         </Button>
                     </div>
 
@@ -99,11 +102,11 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
                                     <Upload className="mx-auto h-12 w-12 text-slate-400 mb-4" />
                                     <p className="text-sm text-slate-600">
                                         {isDragActive
-                                            ? 'Drop the file here...'
-                                            : 'Drag & drop a PDF or text file here, or click to select'}
+                                            ? dict.modals.drop_help
+                                            : dict.modals.drag_and_drop_help }
                                     </p>
                                     <p className="text-xs text-slate-500 mt-2">
-                                        Supports PDF and TXT files
+                                        {dict.modals.supported_filetypes}
                                     </p>
                                 </div>
                             ) : (
@@ -128,7 +131,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
                     {uploadType === 'text' && (
                         <div className="space-y-3">
                             <div>
-                                <label className="text-sm font-medium mb-1 block">Title</label>
+                                <label className="text-sm font-medium mb-1 block">{dict.modals.title_label}</label>
                                 <Input
                                     placeholder="Document title"
                                     value={textTitle}
@@ -136,7 +139,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
                                 />
                             </div>
                             <div>
-                                <label className="text-sm font-medium mb-1 block">Content</label>
+                                <label className="text-sm font-medium mb-1 block">{dict.modals.content_label}</label>
                                 <Textarea
                                     placeholder="Paste your text content here..."
                                     value={textContent}
@@ -151,7 +154,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
                     {/* Actions */}
                     <div className="flex justify-end space-x-2 pt-4">
                         <Button variant="outline" onClick={handleClose}>
-                            Cancel
+                            {dict.buttons.cancel}
                         </Button>
                         <Button
                             onClick={handleSubmit}
@@ -160,7 +163,7 @@ export function UploadDialog({ isOpen, onClose, onUpload }: Props) {
                                 (uploadType === 'text' && !textContent.trim())
                             }
                         >
-                            Upload
+                            {dict.modals.upload_button}
                         </Button>
                     </div>
                 </div>

@@ -59,7 +59,7 @@ export function LLMProvider({ children }: { children: ReactNode }) {
                     const response = await fetch('/api/auth/llm-preferences')
                     if (response.ok) {
                         const data = await response.json()
-                        
+
                         const provider = LLM_PROVIDERS.find(p => p.id === data.provider)
                         if (provider) {
                             setSelectedProviderState(provider)

@@ -8,6 +8,7 @@ import { useLLM } from './LLMProvider'
 import { LLM_PROVIDERS } from '@/lib/llm'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {getDictionary} from "@/app/dict";
 
 export function LLMSelector() {
     const { selectedProvider, selectedModel, setSelectedProvider, setSelectedModel, apiKeys, setApiKey } = useLLM()
@@ -16,6 +17,8 @@ export function LLMSelector() {
     const [chromaApiKey, setChromaApiKey] = useState("")
     const [chromaTenant, setChromaTenant] = useState("")
     const [chromaDatabase, setChromaDatabase] = useState("")
+
+    const dict = getDictionary('pl')
 
     const handleSaveApiKeys = () => {
         Object.entries(tempApiKeys).forEach(([provider, key]) => {
@@ -50,13 +53,13 @@ export function LLMSelector() {
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>LLM Configuration</DialogTitle>
+                        <DialogTitle>{dict.modals.llm_configuration}</DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-6">
                         {/* Provider Selection */}
                         <div>
-                            <label className="text-sm font-medium mb-2 block">Provider</label>
+                            <label className="text-sm font-medium mb-2 block">{dict.modals.provider}</label>
                             <Select
                                 value={selectedProvider?.id}
                                 onValueChange={(value: string) => {
@@ -90,7 +93,7 @@ export function LLMSelector() {
                         {/* Model Selection */}
                         {selectedProvider && (
                             <div>
-                                <label className="text-sm font-medium mb-2 block">Model</label>
+                                <label className="text-sm font-medium mb-2 block">{dict.modals.model}</label>
                                 <Select
                                     value={selectedModel || ''}
                                     onValueChange={setSelectedModel}
@@ -113,7 +116,7 @@ export function LLMSelector() {
                         <div>
                             <label className="text-sm font-medium mb-2 block flex items-center">
                                 <Key className="w-4 h-4 mr-2"/>
-                                API Keys
+                                {dict.modals.api_keys}
                             </label>
                             <div className="space-y-3">
                                 {LLM_PROVIDERS.filter(p => p.requiresApiKey).map((provider) => (
@@ -139,10 +142,10 @@ export function LLMSelector() {
 
                         <div className="flex justify-end space-x-2">
                             <Button variant="outline" onClick={() => setIsOpen(false)}>
-                                Cancel
+                                {dict.buttons.cancel}
                             </Button>
                             <Button onClick={handleSaveApiKeys}>
-                                Save Configuration
+                                {dict.modals.save_configuration}
                             </Button>
                         </div>
                     </div>
