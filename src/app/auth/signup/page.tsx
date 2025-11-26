@@ -120,8 +120,8 @@ export default function SignUpPage() {
 
             if (response.ok) {
                 toast({
-                    title: 'Success',
-                    description: 'Account created successfully',
+                    title: dict.toast.success,
+                    description: dict.toast.sign_in_invalid_creds,
                 })
 
                 // Automatically sign in after successful signup

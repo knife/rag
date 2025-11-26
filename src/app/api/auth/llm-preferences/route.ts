@@ -13,6 +13,9 @@ export async function GET() {
         // Get user by email and fetch preferences
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
+            include: {
+                apiKeys: true,
+            },
         })
 
         if (!user) {
@@ -21,9 +24,15 @@ export async function GET() {
 
         const defaultPrefs = { provider: 'ollama', model: 'llama2', apiKeys: {} }
 
+        let userKeys: Record<string,string>  = {}
+        user.apiKeys.map((record)=> {
+           userKeys[record.provider] = record.key
+        })
+
         return NextResponse.json({
             provider: user.llmProvider || defaultPrefs.provider,
             model: user.llmModel || defaultPrefs.model,
+            apiKeys: userKeys
         })
     } catch (error) {
         console.error('Error fetching LLM preferences:', error)

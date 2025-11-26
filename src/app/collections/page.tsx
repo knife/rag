@@ -53,7 +53,7 @@ export default function CollectionsPage() {
 
             if (response.ok) {
                 toast({
-                    title: 'Success',
+                    title: dict.toast.success,
                     description: 'Collection has been removed.',
                 })
 

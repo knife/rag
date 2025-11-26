@@ -74,6 +74,7 @@ const dictionaries = {
       }
     },
     "toast": {
+      "success": "Success",
       "general_error": "Something went wrong",
       "sign_out": "Signed out successfully",
       "sign_out_error": "Something went wrong during sign out",
@@ -81,7 +82,7 @@ const dictionaries = {
       "sign_in_success": "Signed in successfully",
       "sign_up_passwords_not_match":  "Passwords do not match",
       "sign_up_password_too_weak": "Password is too weak. Please choose a stronger password.",
-      "sign_up_success": "Konto zostało utworzone."
+      "sign_up_success": "Account created successfully",
     },
     "buttons" : {
       "settings": "Settings",
@@ -191,6 +192,7 @@ const dictionaries = {
       }
     },
     "toast": {
+      "success": "Sukces",
       "general_error": "Coś poszło nie tak.",
       "sign_out": "Zostałeś wylogowany.",
       "sign_out_error": "Coś poszło nie tak.",
@@ -198,7 +200,7 @@ const dictionaries = {
       "sign_in_success": "Logowanie zakończone powodzeniem.",
       "sign_up_passwords_not_match":  "Wpisane hasła nie są takie same.",
       "sign_up_password_too_weak": "Hasło jest zbyt słabe. Wpisz mocniejsze hasło.",
-      "sign_up_success": "Account created successfully"
+      "sign_up_success": "Konto zostało utworzone."
     },
     "buttons" : {
       "settings": "Ustawienia",

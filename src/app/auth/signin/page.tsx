@@ -40,7 +40,7 @@ export default function SignInPage() {
                 })
             } else {
                 toast({
-                    title: 'Success',
+                    title: dict.toast.success,
                     description: dict.toast.sign_in_success
                 })
                 router.push('/collections')

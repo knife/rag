@@ -33,7 +33,7 @@ export default function Home() {
             })
 
             toast({
-                title: 'Success',
+                title: dict.toast.success,
                 description: dict.toast.sign_out
             })
 
