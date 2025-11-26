@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { VectorDB } from '@/lib/vectordb'
+import {getApiKeyForProvider, getUserSettings} from "@/lib/llm";
 
 export async function GET(
     request: NextRequest,
@@ -73,8 +74,10 @@ export async function DELETE(
             return NextResponse.json({ error: 'Collection not found' }, { status: 404 })
         }
 
-        // Delete from vector database
-        const vectorDB = new VectorDB()
+        const settings = await getUserSettings(session.user)
+        const apiKey = await getApiKeyForProvider(session.user, 'openai')
+        const vectorDB = new VectorDB({openAiApiKey: apiKey, ...settings})
+        
         try {
             await vectorDB.deleteCollection(id)
         } catch(error) {
