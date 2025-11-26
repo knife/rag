@@ -83,6 +83,10 @@ const dictionaries = {
       "sign_up_passwords_not_match":  "Passwords do not match",
       "sign_up_password_too_weak": "Password is too weak. Please choose a stronger password.",
       "sign_up_success": "Account created successfully",
+      "collection_removed": "Collection has been removed.",
+      "collection_remove_error": "There was an error while removing collection.",
+      "collection_created": "Collection has been created.",
+      "settings_saved": "Settings has been saved."
     },
     "buttons" : {
       "settings": "Settings",
@@ -200,7 +204,11 @@ const dictionaries = {
       "sign_in_success": "Logowanie zakończone powodzeniem.",
       "sign_up_passwords_not_match":  "Wpisane hasła nie są takie same.",
       "sign_up_password_too_weak": "Hasło jest zbyt słabe. Wpisz mocniejsze hasło.",
-      "sign_up_success": "Konto zostało utworzone."
+      "sign_up_success": "Konto zostało utworzone.",
+      "collection_removed": "Kolekcja została usunięta.",
+      "collection_remove_error": "Wystąpił problem z usunięciem kolekcji.",
+      "collection_created": "Kolekcja została utworzona.",
+      "settings_saved": "Ustawienia zostały zapisane."
     },
     "buttons" : {
       "settings": "Ustawienia",

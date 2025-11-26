@@ -54,7 +54,7 @@ export default function CollectionsPage() {
             if (response.ok) {
                 toast({
                     title: dict.toast.success,
-                    description: 'Collection has been removed.',
+                    description: dict.toast.collection_removed
                 })
 
                 await fetchCollections()
@@ -62,7 +62,7 @@ export default function CollectionsPage() {
             } else {
                 toast({
                     title: 'Error',
-                    description: 'There was an error while removing collection.',
+                    description: dict.toast.collection_remove_error,
                     variant: 'destructive',
                 })
             }
@@ -107,6 +107,10 @@ export default function CollectionsPage() {
             if (response.ok) {
                 await fetchCollections()
                 setIsCreateDialogOpen(false)
+                toast({
+                    title: dict.toast.success,
+                    description: dict.toast.collection_created
+                })
             }
         } catch (error) {
             console.error('Error creating collection:', error)
@@ -124,6 +128,10 @@ export default function CollectionsPage() {
 
             if (response.ok) {
                 setIsSettingsDialogOpen(false)
+                toast({
+                    title: dict.toast.success,
+                    description: dict.toast.settings_saved
+                })
             }
         } catch (error) {
             console.error('Error saving settings:', error)
