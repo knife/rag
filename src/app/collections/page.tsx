@@ -13,6 +13,7 @@ import { LLMSelector } from '@/components/llm/LLMSelector'
 import {useLLM} from "@/components/llm/LLMProvider";
 import { getDictionary } from '@/app/dict'
 import {useToast} from "@/components/ui/use-toast";
+import Link from "next/link";
 
 export default function CollectionsPage() {
     const { data: session, status } = useSession()
@@ -155,7 +156,9 @@ export default function CollectionsPage() {
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center space-x-4">
                             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                {dict.app.name}
+                                <Link href="/">
+                                    {dict.app.name}
+                                </Link>
                             </h1>
                         </div>
                         <div className="flex items-center space-x-4">
