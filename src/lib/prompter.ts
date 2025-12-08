@@ -26,6 +26,7 @@ export class Prompter {
 
         // Prepare context
         console.log(this.relevantDocs.metadatas)
+        console.log(this.relevantDocs.distances);
         const context = this.relevantDocs.documents[0]
             .map((doc) => `Document: \nContent: ${doc}`)
             .join('\n\n---\n\n')
