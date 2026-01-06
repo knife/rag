@@ -60,6 +60,7 @@ export class VectorDB {
         try {
             await this.client.createCollection({
                 name: collectionId,
+                metadata: {"hnsw:space": "cosine"},
                 embeddingFunction: this.embedding
             });
         } catch (error) {

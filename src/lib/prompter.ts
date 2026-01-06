@@ -1,6 +1,6 @@
 import {PromptTemplate} from "@langchain/core/prompts";
 
-const CHAT_PROMPT = PromptTemplate.fromTemplate(`
+const CHAT_PROMPT_EN = PromptTemplate.fromTemplate(`
 You are a helpful AI assistant that answers questions based on the provided context from documents.
 
 Context from documents:
@@ -11,6 +11,19 @@ Question: {question}
 Please provide a helpful and accurate answer based on the context above. If the context doesn't contain enough information to answer the question, please say so clearly.
 
 Answer:`)
+
+
+const CHAT_PROMPT = PromptTemplate.fromTemplate(`
+Jesteś pomocnym asystentem AI który odpowiada na pytania na podstawie dostarczonego kontekstu z dokumentów.
+
+Kontekst z dokumentów:
+{context}
+
+Pytanie: {question}
+
+Proszę odpowiedz uprzejmie i zgodnie z dostarczonym kontekstem. Jeśli kontekst nie zawiera danych potrzebnych do odpowiedzi, zakomunikuj to jasno.
+
+Odpowiedź:`)
 
 
 export class Prompter {
