@@ -3,7 +3,11 @@ const dictionaries = {
   "en": {
     "app": {
       "name": "RAG",
-      "full_name": "Asystent RAG"
+      "full_name": "Asystent RAG",
+      "metadata": {
+        "title": "RAG App - Document Chat Assistant",
+        "description": "Chat with your documents using AI"
+      },
     },
     "pages": {
       "sign_in": {
@@ -125,7 +129,11 @@ const dictionaries = {
   "pl": {
     "app": {
       "name": "RAG",
-      "full_name": "Asystent RAG"
+      "full_name": "Asystent RAG",
+      "metadata": {
+        "title": "RAG App - Twój asystent AI",
+        "description": "Rozmawiaj ze swoimi dokumentami za pomocą AI"
+      },
     },
     "pages": {
       "sign_in": {
@@ -167,7 +175,7 @@ const dictionaries = {
       },
       "collections": {
         "title": "Kolekcje dokumentów",
-        "subtitle": "Zoorganizuj swoje dokumenty w foldery i rozmawiaj z nimi za pomocą AI",
+        "subtitle": "Zorganizuj swoje dokumenty w foldery i rozmawiaj z nimi za pomocą AI",
         "documents": "Dokument",
         "no_collections": "Brak kolekcji",
         "new_collection": "Stwórz swoją pierwszą kolekcję aby zacząć organizować dokumenty.",
@@ -188,7 +196,7 @@ const dictionaries = {
         "account_info_header": "Informacje o koncie",
         "email_address": "Adres email",
         "signout": "Wyloguj się",
-        "welcome_header": "Witaj jestem RAG assystentem",
+        "welcome_header": "Witaj jestem asystentem RAG",
         "quick_actions": "Szybkie akcje",
         "my_collections": "Moje kolekcje",
         "help_support": "Pomoc",

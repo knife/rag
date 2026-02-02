@@ -104,7 +104,7 @@ export default function Home() {
                             </div>
                             <div>
                                 <h2 className="text-3xl font-bold text-white mb-2">
-                                    {session.user?.name || 'User Profile'}
+                                    {session.user?.email || 'User Profile'}
                                 </h2>
                                 <p className="text-blue-100">
                                     {dict.pages.account.welcome_header}

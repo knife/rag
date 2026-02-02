@@ -139,7 +139,7 @@ export default function SignUpPage() {
                 const data = await response.json()
                 toast({
                     title: 'Error',
-                    description: data.message || dict.toast.general_error,
+                    description: data.error || dict.toast.general_error,
                     variant: 'destructive',
                 })
             }

@@ -24,7 +24,7 @@ export default function CollectionsPage() {
     const [settings, setSettings] = useState<Record<string, any>>({})
     const [isLoading, setIsLoading] = useState(true)
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-    const [isSetttngsDialogOpen, setIsSettingsDialogOpen] = useState(false)
+    const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false)
 
     const { toast } = useToast()
 
@@ -273,7 +273,7 @@ export default function CollectionsPage() {
             />
             <SettingsDialog
                 settings={settings}
-                isOpen={isSetttngsDialogOpen}
+                isOpen={isSettingsDialogOpen}
                 onClose={() => setIsSettingsDialogOpen(false)}
                 onSubmit={handleSaveSettings}
             />
