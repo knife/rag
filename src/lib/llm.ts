@@ -75,12 +75,6 @@ export async function createLLMInstance(provider: LLMProvider, model: string, ap
             openAIApiKey: apiKey || 'abc',
             modelName: model,
         })
-    } else if (provider.id === 'anthropic') {
-        const { ChatAnthropic } = await import('@langchain/anthropic')
-        return new ChatAnthropic({
-            anthropicApiKey: apiKey,
-            modelName: model,
-        })
     }
 
     throw new Error(`Unsupported provider: ${provider.id}`)
